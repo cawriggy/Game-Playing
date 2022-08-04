@@ -17,6 +17,7 @@
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
 #include "Player_Minimax.h"
+#include "Player_Alphabeta.h"
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
@@ -28,19 +29,26 @@ int main()
     Contest c = Contest();
     auto game = Noughts_and_Crosses();
     //auto p = Player_FirstValidAction();
-    auto pMinmax = Player_Minimax();
     auto pRandom = Player_Random();
+    auto pMinmax = Player_Minimax();
+    auto pAlphabeta = Player_Alphabeta();
+
 
     int n = 100;
     std::map<Game::PlayState, int> counts;
     c.PlayNGames(game, pRandom, pRandom, n, counts);
     
-    counts.clear();
-    c.PlayNGames(game, pMinmax, pRandom, n, counts);
-    
-    counts.clear();
-    c.PlayNGames(game, pRandom, pMinmax, n, counts);
+    //counts.clear();
+    //c.PlayNGames(game, pMinmax, pRandom, n, counts);
+    //
+    //counts.clear();
+    //c.PlayNGames(game, pRandom, pMinmax, n, counts);
 
+    counts.clear();
+    c.PlayNGames(game, pAlphabeta, pRandom, n, counts);
+
+    counts.clear();
+    c.PlayNGames(game, pRandom, pAlphabeta, n, counts);
     //auto qq = getchar();
     
 }

@@ -12,7 +12,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTestGamePlaying
 {
-	TEST_CLASS(UnitTest_Contest)
+	TEST_CLASS(Test_Contest)
 	{
 	public:
 		TEST_METHOD(TestPlaysNoughtsAndCrosses)
