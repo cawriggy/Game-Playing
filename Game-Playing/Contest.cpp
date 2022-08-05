@@ -29,9 +29,13 @@ Game::PlayState Contest::PlayGame(Game& game, Player& p1, Player& p2)
 void Contest::PlayNGames(Game& game, Player& p1, Player& p2, int n, std::map<Game::PlayState, int>& OutCounts)
 {
     //begin count at 0
-    OutCounts.emplace(Game::Tie, 0);
+    OutCounts.insert_or_assign(Game::Tie, 0);
+    OutCounts.insert_or_assign(Game::Player1Wins, 0);
+    OutCounts.insert_or_assign(Game::Player2Wins, 0);
+
+   /* OutCounts.emplace(Game::Tie, 0);
     OutCounts.emplace(Game::Player1Wins, 0);
-    OutCounts.emplace(Game::Player2Wins, 0);
+    OutCounts.emplace(Game::Player2Wins, 0);*/
 
     for (int i = 0; i < n; i++)
     {

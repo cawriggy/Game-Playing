@@ -39,6 +39,9 @@
     <ClCompile Include="Player_Alphabeta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Player_BestNodeSearch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Player_Alphabeta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_BestNodeSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

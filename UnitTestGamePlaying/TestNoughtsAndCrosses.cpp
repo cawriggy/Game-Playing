@@ -138,29 +138,18 @@ namespace UnitTestGamePlaying
 
 		}
 
+		//TEST_METHOD(TestNewGameEquality)
+		//{
+		//	auto game = Noughts_and_Crosses();
+		//	auto game2 = Noughts_and_Crosses();
+		//	Assert::IsTrue(game ^ game2)
+		//}
+
 
 		TEST_METHOD(TestThrow)
 		{
-			auto game = Noughts_and_Crosses();
-			game.Reset();
-
-			// Board layout
-			//  0 1 2
-			//  3 4 5
-			//  6 7 8
-
-			//  tie
-			//  1 2 1
-			//  1 2 2
-			//  2 1 1
-			for (int action : {0, 4, 8, 1, 7, 6, 2, 5, 3})
-			{
-				game.Act(action);
-			}
-
-			//Assert::IsTrue(game.GetPlayState() == Game::Tie);
-			int e = 11;
-			throw(e);
+			//throw does cause test to fail
+			//throw(11);
 
 		}
 

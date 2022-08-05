@@ -18,6 +18,7 @@
 #include "Player_Random.h"
 #include "Player_Minimax.h"
 #include "Player_Alphabeta.h"
+#include "Player_BestNodeSearch.h"
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
@@ -32,6 +33,7 @@ int main()
     auto pRandom = Player_Random();
     auto pMinmax = Player_Minimax();
     auto pAlphabeta = Player_Alphabeta();
+    auto pBestNode = Player_BestNodeSearch();
 
 
     int n = 100;
@@ -49,6 +51,12 @@ int main()
 
     counts.clear();
     c.PlayNGames(game, pRandom, pAlphabeta, n, counts);
+
+    counts.clear();
+    c.PlayNGames(game, pBestNode, pRandom, n, counts);
+
+    counts.clear();
+    c.PlayNGames(game, pRandom, pBestNode, n, counts);
     //auto qq = getchar();
     
 }

@@ -147,6 +147,8 @@ int Noughts_and_Crosses::GetTurnNumber() const
 
 void Noughts_and_Crosses::GetValidActions(std::vector<int>& OutActions) const
 {
+    //its faster to reserve what you need upfront, you can shrink to fit later if you need
+    OutActions.reserve(9);
     for (int Action: AllActions)
     {
         if (IsValidAction(Action)) 
@@ -154,6 +156,7 @@ void Noughts_and_Crosses::GetValidActions(std::vector<int>& OutActions) const
             OutActions.push_back(Action);
         }
     }
+    //OutActions.shrink_to_fit();
 }
 
 Game::PlayState Noughts_and_Crosses::GetPlayState() const

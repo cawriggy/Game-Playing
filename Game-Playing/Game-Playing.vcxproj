@@ -136,6 +136,7 @@
     <ClCompile Include="Noughts_and_Crosses.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player_Alphabeta.cpp" />
+    <ClCompile Include="Player_BestNodeSearch.cpp" />
     <ClCompile Include="Player_FirstValidAction.cpp" />
     <ClCompile Include="Player_Minimax.cpp" />
     <ClCompile Include="Player_Random.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Noughts_and_Crosses.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Player_Alphabeta.h" />
+    <ClInclude Include="Player_BestNodeSearch.h" />
     <ClInclude Include="Player_FirstValidAction.h" />
     <ClInclude Include="Player_Minimax.h" />
     <ClInclude Include="Player_Random.h" />

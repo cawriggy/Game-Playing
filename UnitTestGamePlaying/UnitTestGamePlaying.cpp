@@ -5,6 +5,7 @@
 #include "../Game-Playing/Player_Random.h"
 //#include "../Game-Playing/Player_Minimax.h"
 #include <map>
+#include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -51,6 +52,28 @@ namespace UnitTestGamePlaying
 			total += outcomes[Game::Player2Wins];
 
 			Assert::IsTrue(total == n);
+		}
+
+	};
+
+	TEST_CLASS(Test_Ops) 
+	{
+		TEST_METHOD(TestSwap)
+		{
+			std::vector<int> intV = { 0,1,2,3,4,5 };
+			Logger::WriteMessage("testing equality\n");
+			Assert::IsTrue(intV == std::vector<int>{ 0, 1, 2, 3, 4, 5 });
+			
+			Logger::WriteMessage("swapping\n");
+			std::swap(intV[1], intV[3]);
+			
+			Logger::WriteMessage("testing equality\n");
+			Assert::IsTrue(intV == std::vector<int>{ 0, 3, 2, 1, 4, 5 });
+
+			//Logger::WriteMessage("Note: a failed Assert terminates a test\n");
+			//Assert::IsTrue(false);
+			//Logger::WriteMessage("this does not get printed\n");
+
 		}
 
 	};

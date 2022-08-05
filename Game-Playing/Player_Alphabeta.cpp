@@ -1,30 +1,32 @@
+//player_alphabeta.cpp
+// implements alphabeta pruning for faster minmax evaluations
+
+//could be optimised further by:
+// better move ordering, e.g. by iterative deepening
+// caching results
+// null window searches
+// using a negamax version for zero-sum games?
+
+
 #include "Player_Alphabeta.h"
-
 #include <assert.h>
-#include <cstdlib> //for rand
-
-
-// -----  work in progress  -----
+#include <cstdlib> //for rand (in playout policy)
 
 
 /// <summary>
-/// Choose an action to win as early as possible or lose as late as possible
-/// uses alphabeta pruning to calculate minmax more efficiently
+/// Choose an action to win as early as possible or lose as late as possible.
+/// Uses alphabeta pruning to minmax more efficiently.
 /// </summary>
 /// <param name="game">: reference to the current game state</param>
 /// <returns></returns>
 int Player_Alphabeta::ChooseAction(const Game& game)
 {
 	//choose an action to maximise minimum score
-	//int bestScore = static_cast<int>(-1e9);
+
 	int bestAction = -1;
+	int bestScore = static_cast<int>(-1e9);
 	int a = static_cast<int>(-1e9);
 	int b = static_cast<int>(1e9);
-
-
-	// maximise score
-	// using a bestScore seperate from 'a' allows retuning an upper bound below 'a'
-	int bestScore = static_cast<int>(-1e9);
 
 	std::vector<int> validActions;
 	game.GetValidActions(validActions);
@@ -35,30 +37,16 @@ int Player_Alphabeta::ChooseAction(const Game& game)
 
 		int score = MinmaxState(*nextState, depthLimit, a, b);
 
-		if (score >= b)
-		{
-			// acceptable score >= 'b'
-			// since we are maximising, any further acceptable moves will also be >= 'b'
-			// we have a lower bound >= 'b'
-			// we dont need to try the other moves
-			
-			//no acceptable action in the a-b window
-			assert(false);
-			return -1;
-		}
-
 		if (score > a)
 		{
 			// acceptable score above 'a'
-			// since we are maximising, any further acceptable moves will also be above 'a'
+			// since we are maximising, any further acceptable actions will also score above 'a'
 			// improved lower bound
 			a = score;
-			// note that if we were below 'a', we may yet see a score above 'a' so we can not be sure we are outside the bounds
 		}
 
 		if (score > bestScore)
 		{
-			// find the biggest scoring move
 			bestScore = score;
 			bestAction = action;
 		}
@@ -70,7 +58,8 @@ int Player_Alphabeta::ChooseAction(const Game& game)
 }
 
 
-
+// assign greater scores for more favorable outcomes
+// win as early as possible or tie or lose as late as possible
 int Player_Alphabeta::ScoreTerminalState(const Game& game) const
 {
 	auto outcome = game.GetPlayState();
@@ -78,15 +67,16 @@ int Player_Alphabeta::ScoreTerminalState(const Game& game) const
 	assert(outcome != Game::Unfinished);
 	assert(turnNumber < 1000 && (turnNumber > 4));
 
-	//tie scores 0
+	// tie scores 0
 	if (outcome == Game::Tie) return 0;
 
-	//win scores positively with greater scores for earlier wins
+	// win scores positively with greater scores for earlier wins
 	if (outcome == GetPlayerId()) return 1000 - turnNumber;
 
-	//loss scores negatively with greater scores (less negative) for later losses
+	// loss scores negatively with greater scores (less negative) for later losses
 	return turnNumber - 1000;
 }
+
 
 int Player_Alphabeta::ScoreLowerBound(const Game& game) const
 {
@@ -94,11 +84,13 @@ int Player_Alphabeta::ScoreLowerBound(const Game& game) const
 	return (game.GetTurnNumber() + 1) - 1000;
 }
 
+
 int Player_Alphabeta::ScoreUpperBound(const Game& game) const
 {
 	// score of winning 2 turns later
 	return 1000 - (game.GetTurnNumber() + 2);
 }
+
 
 //score a possibly non-terminal state
 int Player_Alphabeta::ScoreState(Game& game) const
@@ -106,6 +98,7 @@ int Player_Alphabeta::ScoreState(Game& game) const
 	PlayoutState(game);
 	return ScoreTerminalState(game);
 }
+
 
 //use playout policy to reach a terminal state
 void Player_Alphabeta::PlayoutState(Game& game) const
@@ -115,6 +108,7 @@ void Player_Alphabeta::PlayoutState(Game& game) const
 		game.Act(PlayoutPolicy(game));
 	}
 }
+
 
 //how to choose a move when playing to a terminal state to get a score
 int Player_Alphabeta::PlayoutPolicy(const Game& game) const
@@ -129,10 +123,17 @@ int Player_Alphabeta::PlayoutPolicy(const Game& game) const
 
 
 
-//fail-soft alphabeta
-// Only determine precise scores between 'a' and 'b'.
-// outside a-b an upper or lower bound is sufficient
-// (fail-soft: it can return an upper bound less than 'a' or a lower bound greater than 'b'). 
+/// <summary>
+/// Calculate minmax score of a game state using AlphaBeta pruning.
+/// Only determine precise scores between 'a' and 'b'.
+/// Uses fail-soft AlphaBeta; it can return an upper bound less than 'a' or a lower bound greater than 'b'.
+/// 
+/// </summary>
+/// <param name="game">: The game state to evaluate</param>
+/// <param name="depth">: How many moves to look ahead beyond the immediate choice</param>
+/// <param name="a">: The lower bound on relevant scores</param>
+/// <param name="b">: The upper bound on relevant scores</param>
+/// <returns></returns>
 int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 {
 	if ((depth == 0) || (game.GetPlayState() != Game::Unfinished)) { return ScoreState(game); }
@@ -143,7 +144,6 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 	{
 		// maximise score
 		// using a bestScore seperate from 'a' allows retuning an upper bound below 'a'
-		//int bestScore = static_cast<int>(-1e9);
 		int bestScore = ScoreLowerBound(game);
 		if (bestScore >= b)
 		{
@@ -194,7 +194,6 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 	{
 		//minimise
 		//using a bestScore seperate from 'b' allows retuning an lower bound above 'b'
-		//int bestScore = static_cast<int>(1e9);
 
 		//initally worst score
 		int bestScore = ScoreUpperBound(game);
