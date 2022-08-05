@@ -259,23 +259,19 @@ int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 {
 	//todo: check for redundant ifs
-	//todo: correct it so it makes all winning moves
-	//todo: make it faster
-	//todo: start with previous test value
+	//todo: make it faster, (possibly make it recursive?)
 
 	std::vector<int> validActions;
 	game.GetValidActions(validActions);
 
 	int numOptions = validActions.size();
 	int bestAction = -1;
-	int numBetter;
-	int greatestValue = static_cast<int>(-1e9);
-	bool first = false;
+	int numBetter = 0;
+	//int greatestValue = static_cast<int>(-1e9);
 	int bestValue = static_cast<int>(-1e9);
 	
-	int start = 0;
+	bool first = true;
 	int end = validActions.size() - 1;
-	bool atStart = true;
 
 	do
 	{
@@ -286,14 +282,13 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 			first = false;
 		}
 
-		
 		numBetter = 0;
 
 		//for (int action : validActions)
 
 		// keep relevent actions at the start of the vector
 		// loop over the relevent actions
-		start = 0;
+		//start = 0;
 		end = numOptions - 1;
 		for (int i = 0; i <= end;i++)
 		{
@@ -308,11 +303,6 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 			{
 				numBetter++;
 				bestAction = action;
-
-				//if (HasDoneInitialSearch) 
-				//{
-				//	return action;
-				//}
 
 				if (value > bestValue)
 				{
@@ -392,85 +382,3 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 	return bestAction;
 }
 
-
-
-
-//
-//int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
-//{
-//	//todo: check for redundant ifs
-//
-//	std::vector<int> validActions;
-//	game.GetValidActions(validActions);
-//
-//	int numOptions = validActions.size();
-//	int bestAction = -1;
-//	int numBetter;
-//	int greatestValue = static_cast<int>(-1e9);
-//	do
-//	{
-//		int test = NextTestScore(a, b, numOptions);
-//		numBetter = 0;
-//
-//		for (int action : validActions)
-//		{
-//			//get next state
-//			auto nextState = game.Clone();
-//			nextState->Act(action);
-//
-//			// perform null window search to check if valued above or below test
-//			int value = MinmaxState(*nextState, GetDepthLimit(), test-1, test + 1);
-//
-//			if (value >= test)
-//			{
-//				numBetter++;
-//				bestAction = action;
-//
-//				if (value > a)
-//				{
-//					a = value;
-//				}
-//
-//			}
-//
-//			if (value > greatestValue)
-//			{
-//				greatestValue = value;
-//			}
-//
-//		}
-//		//checked all actions
-//
-//		if (greatestValue < b)
-//		{
-//			b = greatestValue;
-//		}
-//
-//		if (numBetter < 1)
-//		{
-//			//test value too high
-//			if (test < b)
-//			{
-//				b = test;
-//			}
-//
-//		}
-//
-//		if (numBetter > 1)
-//		{
-//			//test too low
-//			if (test > a)
-//			{
-//				a = test;
-//			}
-//		}
-//
-//		if (numBetter > 0)
-//		{
-//			numOptions = numBetter;
-//		}
-//
-//	} while ((b - a >= 2) && (numBetter != 1));
-//
-//	return bestAction;
-//}
