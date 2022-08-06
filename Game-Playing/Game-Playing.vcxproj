@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="Contest.cpp" />
     <ClCompile Include="Game-Playing.cpp" />
+    <ClCompile Include="Game_Connect4.cpp" />
     <ClCompile Include="Noughts_and_Crosses.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player_Alphabeta.cpp" />
@@ -145,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="Contest.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Game_Connect4.h" />
     <ClInclude Include="Noughts_and_Crosses.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Player_Alphabeta.h" />
