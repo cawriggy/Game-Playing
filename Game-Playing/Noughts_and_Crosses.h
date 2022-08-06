@@ -18,6 +18,7 @@ public:
 	PlayState GetPlayState() const;
 	void Reset();
 	std::unique_ptr<Game> Clone() const { return std::make_unique<Noughts_and_Crosses>(*this); }
+	std::vector<int> GetStateVector() const;
 
 	// visualisation
 	void Display() const;

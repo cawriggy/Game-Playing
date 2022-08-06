@@ -24,4 +24,5 @@ public:
 	virtual void Reset() = 0;
 	virtual ~Game() = default;
 	virtual std::unique_ptr<Game> Clone() const = 0;
+	virtual std::vector<int> GetStateVector() const = 0;
 };

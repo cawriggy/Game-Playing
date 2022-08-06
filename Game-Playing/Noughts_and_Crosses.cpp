@@ -2,41 +2,17 @@
 #include <iostream>
 #include <assert.h>
 #include <vector>
+#include <bit>
 
 
 void Noughts_and_Crosses::Display() const
 {
-    //display the board as text
-    int i = 0;
-    char s[] = "\n_ _ _\n_ _ _\n_ _ _\n\n";
-    for (char& c : s)
-    {
-        if (c == '_')
-        {
-            assert(IsValidCell(i));
-            int t = BoardState[i];
-            assert(t == 0 || t == 1 || t == 2);
-            c = "_12"[t];
-            i++;
-        }
-    }
-    std::cout << s;
+    std::cout << GetDisplayString();
 }
 
 void Noughts_and_Crosses::DisplayActionSequence() const
 {
-    auto game = Noughts_and_Crosses();
-    game.Reset();
-    std::cout << "move 0";
-    game.Display();
-    for (int i = 0; i < TurnNumber; i++)
-    {
-        std::cout << "move " << i + 1;
-        int action = ActionSequence[i];
-        game.Act(action);
-        game.Display();
-    }
-    //auto playState = game.GetPlayState();
+    std::cout << GetDisplayActionSequenceString();
 }
 
 std::string Noughts_and_Crosses::GetDisplayString() const
@@ -82,6 +58,7 @@ bool Noughts_and_Crosses::IsValidAction(int Action) const
     return BoardState[i] == 0;
 }
 
+
 void Noughts_and_Crosses::Act(int Action)
 {
     assert(IsValidAction(Action));
@@ -89,8 +66,7 @@ void Noughts_and_Crosses::Act(int Action)
     assert(p == 1 || p == 2);// "invalid player number"
     assert(TurnNumber < 9 && TurnNumber >= 0);
     BoardState[Action] = p;
-    ActionSequence[TurnNumber] = Action;
-    TurnNumber++;
+    ActionSequence[TurnNumber++] = Action;
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
 }
 
@@ -178,6 +154,11 @@ void Noughts_and_Crosses::Reset()
     TurnNumber = 0;
     ActivePlayer = 1;
     std::fill(std::begin(BoardState), std::end(BoardState), 0);
+}
+
+std::vector<int> Noughts_and_Crosses::GetStateVector() const
+{
+    return std::vector<int>(std::begin(BoardState), std::end(BoardState));
 }
 
 
