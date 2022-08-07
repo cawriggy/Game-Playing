@@ -47,7 +47,7 @@ private:
 
 	int BoardState[42] = { 0 };
 	int TurnNumber = 0;
-	int ActivePlayer = 0;
+	int ActivePlayer = 1;
 	int ActionSequence[42] = { 0 };
 
 	const int WinGroups[69][4] = {
