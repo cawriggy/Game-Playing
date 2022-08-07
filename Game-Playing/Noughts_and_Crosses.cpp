@@ -64,6 +64,7 @@ void Noughts_and_Crosses::Act(int Action)
     assert(IsValidAction(Action));
     const int p = GetActivePlayer();
     assert(p == 1 || p == 2);// "invalid player number"
+    assert(GetPlayState() == Game::Unfinished);
     assert(TurnNumber < 9 && TurnNumber >= 0);
     BoardState[Action] = p;
     ActionSequence[TurnNumber++] = Action;

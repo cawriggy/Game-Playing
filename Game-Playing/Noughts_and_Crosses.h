@@ -26,6 +26,11 @@ public:
 	std::string GetDisplayString() const;
 	std::string GetDisplayActionSequenceString() const;
 
+	Noughts_and_Crosses()
+	{
+		Reset();
+	}
+
 	bool IsWinningState() const;
 	const int AllActions[9] = { 0,1,2,3,4,5,6,7,8 };
 	
