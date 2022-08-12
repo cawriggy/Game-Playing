@@ -14,7 +14,8 @@ public:
 	int GetActivePlayer() const;
 	int GetTurnNumber() const;
 	void GetValidActions(std::vector<int>& OutValidActions) const;
-	void Act(int Act) override;
+	void Do(int action) override;
+	void Undo(int action) override;
 	PlayState GetPlayState() const;
 	void Reset();
 	std::unique_ptr<Game> Clone() const { return std::make_unique<Game_Connect4>(*this); }

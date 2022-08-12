@@ -21,7 +21,14 @@ public:
 	virtual PlayState GetPlayState() const = 0;
 
 	virtual void GetValidActions(std::vector<int>& OutValidActions) const = 0;
-	virtual std::vector<int> GetValidActions() const = 0;
+	//virtual std::vector<int> GetValidActions() const = 0;
+	std::vector<int> GetValidActions() const 
+	{
+		std::vector<int> validActions;
+		GetValidActions(validActions);
+		return validActions;
+	}
+
 	
 	virtual void Do(int Act) = 0;
 	virtual void Undo(int Action) = 0;

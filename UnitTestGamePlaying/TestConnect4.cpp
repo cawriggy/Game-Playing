@@ -26,7 +26,7 @@ namespace UnitTestGamePlaying
 			{ 
 				for (auto action : actions)
 				{
-				gameObj.Act(action);
+				gameObj.Do(action);
 				}
 			}
 			catch (const char* msg)
@@ -58,7 +58,7 @@ namespace UnitTestGamePlaying
 			std::vector<int> validActions;
 			game.GetValidActions(validActions);
 			Assert::IsTrue(validActions.size() > 0);
-			game.Act(validActions[0]);
+			game.Do(validActions[0]);
 		}
 
 		TEST_METHOD(TestPlayer1Starts)
@@ -72,7 +72,7 @@ namespace UnitTestGamePlaying
 			auto game = GameClass();
 			std::vector<int> validActions;
 			game.GetValidActions(validActions);
-			game.Act(validActions[0]);
+			game.Do(validActions[0]);
 			Assert::IsTrue(game.GetActivePlayer() == 2);
 		}
 
@@ -127,7 +127,7 @@ namespace UnitTestGamePlaying
 			{
 				for (auto action : actions)
 				{
-					gameObj.Act(action);
+					gameObj.Do(action);
 				}
 			}
 			catch (const char* msg)

@@ -43,7 +43,7 @@ std::string Game_Connect4::GetDisplayActionSequenceString() const
     {
         result += "move " + std::to_string(i + 1);
         int action = ActionSequence[i];
-        game.Act(action);
+        game.Do(action);
         result += game.GetDisplayString();
     }
     return result;
@@ -56,7 +56,7 @@ bool Game_Connect4::IsValidAction(int Action) const
     return BoardState[i] == 0;
 }
 
-void Game_Connect4::Act(int Action) 
+void Game_Connect4::Do(int Action) 
 {
     assert(IsValidAction(Action));
     if (!(GetPlayState() == Game::Unfinished)) 
@@ -70,8 +70,26 @@ void Game_Connect4::Act(int Action)
     while (BoardState[row * 7 + Action])
         row--;
     BoardState[row * 7 + Action] = p; // fill from bottom
-    ActionSequence[TurnNumber] = Action;
-    TurnNumber++;
+    ActionSequence[TurnNumber++] = Action;
+    ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
+}
+
+void Game_Connect4::Undo(int Action)
+{
+    TurnNumber--;
+    assert(TurnNumber < 42 && TurnNumber >= 0);
+    assert(ActionSequence[TurnNumber] == Action);
+    const int p = GetActivePlayer();
+    assert(p == 1 || p == 2);// "invalid player number"
+
+    int row = 5;
+    while (BoardState[row * 7 + Action])
+    {
+        row--;
+    }
+    row++; //go back one space
+
+    BoardState[row * 7 + Action] = 0; // clear from to top
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
 }
 
