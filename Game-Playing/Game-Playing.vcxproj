@@ -122,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +141,7 @@
     <ClCompile Include="Player_BestNodeSearch.cpp" />
     <ClCompile Include="Player_FirstValidAction.cpp" />
     <ClCompile Include="Player_Minimax.cpp" />
+    <ClCompile Include="Player_MinmaxWMem.cpp" />
     <ClCompile Include="Player_Random.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +153,7 @@
     <ClInclude Include="Player_BestNodeSearch.h" />
     <ClInclude Include="Player_FirstValidAction.h" />
     <ClInclude Include="Player_Minimax.h" />
+    <ClInclude Include="Player_MinmaxWMem.h" />
     <ClInclude Include="Player_Random.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

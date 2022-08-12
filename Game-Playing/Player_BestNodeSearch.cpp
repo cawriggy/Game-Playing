@@ -4,6 +4,12 @@
 // we want to pick the option with the greatest minmax score
 // we don't require the minmax score we just want the best choice
 
+//
+// ideas
+// iterative deepening
+// order moves
+// 
+//
 
 
 #include "Player_BestNodeSearch.h"
@@ -23,41 +29,12 @@ int Player_BestNodeSearch::ChooseAction(const Game& game)
 {
 	//choose an action to maximise minimum score
 
-	//int bestAction = -1;
-	//int bestScore = static_cast<int>(-1e9);
-	//int a = static_cast<int>(-1e9);
-	//int b = static_cast<int>(1e9);
+	//clear caches, a simple yet suboptimal way to help maintain consistency with a receding horizon
+	LowerBoundCache.clear();
+	UpperBoundCache.clear();
 
 	int a = ScoreLowerBound(game) - 1;
 	int b = ScoreUpperBound(game) + 1;
-
-	//std::vector<int> validActions;
-	//game.GetValidActions(validActions);
-	//for (int action : validActions)
-	//{
-	//	auto nextState = game.Clone();
-	//	nextState->Act(action);
-
-	//	int score = MinmaxState(*nextState, depthLimit, a, b);
-
-	//	if (score > a)
-	//	{
-	//		// acceptable score above 'a'
-	//		// since we are maximising, any further acceptable actions will also score above 'a'
-	//		// improved lower bound
-	//		a = score;
-	//	}
-
-	//	if (score > bestScore)
-	//	{
-	//		bestScore = score;
-	//		bestAction = action;
-	//	}
-
-
-	//}
-
-	//return bestAction;
 
 	int action = BestNodeSearch(game, a, b);
 	HasDoneInitialSearch = true;
@@ -102,45 +79,46 @@ int Player_BestNodeSearch::ScoreUpperBound(const Game& game) const
 //score a possibly non-terminal state
 int Player_BestNodeSearch::ScoreState(Game& game) const
 {
-	PlayoutState(game);
+	//PlayoutState(game);
+	if (game.GetPlayState() == Game::Unfinished) { return 0; }
 	return ScoreTerminalState(game);
 }
 
 
-//use playout policy to reach a terminal state
-void Player_BestNodeSearch::PlayoutState(Game& game) const
-{
-	while (game.GetPlayState() == Game::Unfinished)
-	{
-		game.Act(PlayoutPolicy(game));
-	}
-}
-
-
-//how to choose a move when playing to a terminal state to get a score
-int Player_BestNodeSearch::PlayoutPolicy(const Game& game) const
-{
-	std::vector<int> validActions;
-	game.GetValidActions(validActions);
-
-	//pick random move
-	return validActions[rand() % validActions.size()];
-}
+////use playout policy to reach a terminal state
+//void Player_BestNodeSearch::PlayoutState(Game& game) const
+//{
+//	while (game.GetPlayState() == Game::Unfinished)
+//	{
+//		game.Do(PlayoutPolicy(game));
+//	}
+//}
+//
+//
+////how to choose a move when playing to a terminal state to get a score
+//int Player_BestNodeSearch::PlayoutPolicy(const Game& game) const
+//{
+//	std::vector<int> validActions;
+//	game.GetValidActions(validActions);
+//
+//	//pick random move
+//	return validActions[rand() % validActions.size()];
+//}
 
 
 
 
 /// <summary>
 /// Calculate minmax score of a game state using AlphaBeta pruning.
-/// Only determine precise scores between 'a' and 'b'.
-/// Uses fail-soft AlphaBeta; it can return an upper bound less than 'a' or a lower bound greater than 'b'.
-/// 
+/// Only determine precise scores between a and b.
+/// Uses fail-soft AlphaBeta; it can return an upper bound at most a or a lower bound at least b.
+/// The exact minmax value will be returned if it lies between a and b.
 /// </summary>
-/// <param name="game">: The game state to evaluate</param>
-/// <param name="depth">: How many moves to look ahead beyond the immediate choice</param>
-/// <param name="a">: The lower bound on relevant scores</param>
-/// <param name="b">: The upper bound on relevant scores</param>
-/// <returns></returns>
+/// <param name="game">: the game state to evaluate</param>
+/// <param name="depth">: how many moves to look ahead beyond the immediate choice</param>
+/// <param name="a">: the lower bound on relevant scores</param>
+/// <param name="b">: the upper bound on relevant scores</param>
+/// <returns>the minmax value of the game state</returns>
 int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 {
 	if ((depth == 0) || (game.GetPlayState() != Game::Unfinished)) { return ScoreState(game); }
@@ -157,12 +135,26 @@ int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 			return bestScore;
 		}
 
+		auto stateVector = game.GetStateVector();
+		if (LowerBoundCache.contains(stateVector))
+		{
+			int bound = LowerBoundCache[stateVector];
+			if (bound > b)
+			{
+				return bound;
+			}
+			else if (bound > a)
+			{
+				a = bound-1;
+			}
+		} 
+
 		std::vector<int> validActions;
 		game.GetValidActions(validActions);
 		for (int action : validActions)
 		{
 			auto nextState = game.Clone();
-			nextState->Act(action);
+			nextState->Do(action);
 
 			int score = MinmaxState(*nextState, depth - 1, a, b);
 
@@ -172,6 +164,9 @@ int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 				// since we are maximising, any further acceptable moves will also be >= 'b'
 				// we have a lower bound >= 'b'
 				// we dont need to try the other moves
+				////LowerBoundCache[stateVector] = score-1;
+				////stateVector = nextState->GetStateVector();
+				//LowerBoundCache[stateVector] = score-1;
 				return score;
 			}
 
@@ -210,12 +205,26 @@ int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 			return bestScore;
 		}
 
+		auto stateVector = game.GetStateVector();
+		if (UpperBoundCache.contains(stateVector))
+		{
+			int bound = UpperBoundCache[stateVector];
+			if (bound < a)
+			{
+				return bound;
+			}
+			else if (bound < b)
+			{
+				a = bound + 1;
+			}
+		}
+
 		std::vector<int> validActions;
 		game.GetValidActions(validActions);
 		for (int action : validActions)
 		{
 			auto nextState = game.Clone();
-			nextState->Act(action);
+			nextState->Do(action);
 
 			int score = MinmaxState(*nextState, depth - 1, a, b);
 
@@ -223,8 +232,9 @@ int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 			{
 				// acceptable score <= 'a'
 				// since we are minimising, any further acceptable moves will also be <= 'a'
-				// we have an upper bound <= 'a'
-				// we dont need to try the other moves
+				//// we have an upper bound <= 'a'
+				//// we dont need to try the other moves
+				//UpperBoundCache[stateVector] = a;
 				return score;
 			}
 
@@ -259,7 +269,7 @@ int Player_BestNodeSearch::MinmaxState(Game& game, int depth, int a, int b)
 int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 {
 	//todo: check for redundant ifs
-	//todo: make it faster, (possibly make it recursive?)
+	//todo: make it faster
 
 	std::vector<int> validActions;
 	game.GetValidActions(validActions);
@@ -267,7 +277,6 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 	int numOptions = validActions.size();
 	int bestAction = -1;
 	int numBetter = 0;
-	//int greatestValue = static_cast<int>(-1e9);
 	int bestValue = static_cast<int>(-1e9);
 	
 	bool first = true;
@@ -275,44 +284,41 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 
 	do
 	{
-		int test = NextTestScore(a, b, numOptions);
+		int test = (a + b) / 2; //NextTestScore(a, b, numOptions);
+		
+		//use the previous test value first
 		if (first)
 		{
 			test = previousScoreTest;
 			first = false;
 		}
+		//store the last test we used so we can start with it next time
+		previousScoreTest = test;
+
 
 		numBetter = 0;
 
-		//for (int action : validActions)
-
-		// keep relevent actions at the start of the vector
-		// loop over the relevent actions
-		//start = 0;
+		// loop over the relevent actions while swapping irrelevent actions out of the way
 		end = numOptions - 1;
 		for (int i = 0; i <= end;i++)
 		{
 			int action = validActions[i];
-			auto nextState = game.Clone();
-			nextState->Act(action);
 
+			auto nextState = game.Clone();
+			nextState->Do(action);
 			// perform focused search to check if the state is valued above or below test
 			int value = MinmaxState(*nextState, GetDepthLimit(), test-1, test+1);
+
 
 			if (value >= test)
 			{
 				numBetter++;
 				bestAction = action;
+				test = value;
 
 				if (value > bestValue)
 				{
 					bestValue = value;
-				}
-
-				//raise the bar upon finding a better lower bound
-				if (value > test)
-				{
-					test = value;
 				}
 
 			}
@@ -345,7 +351,7 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 		if (numBetter > 1)
 		{
 			//test too low
-			//many things passed it
+			//many options passed it
 			if (test > a)
 			{
 				a = test;
@@ -361,14 +367,11 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 		if (bestValue == test)
 		{
 			//stop if the best value matches the test
-			// if using a unit window (b=a+2) then this means we found the exact minmax value so we are done
-			// if using a null window (b=a+1) then there could be a better option (not all the best so far may be truely equal) but this might be unlikely
-			//    especially if good move ordering is used.
+			// if using a unit window (b=a+2) then we found the exact minmax value so we are done
+			// if using a null window (b=a+1) then there could be a better option but this might be unlikely (not all the best so far may be truely equal)
 			break;
 		}
 
-		//remember the last test we used so we can start with it next time
-		previousScoreTest = test;
 
 	} while ((b - a >= 2) && (numBetter != 1));
 	//previousScoreTest = test
@@ -382,3 +385,134 @@ int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
 	return bestAction;
 }
 
+
+
+//
+//int Player_BestNodeSearch::BestNodeSearch(const Game& game, int a, int b)
+//{
+//	//todo: check for redundant ifs
+//	//todo: make it faster, (possibly make it recursive?)
+//
+//	//std::map<int, int> upperBoundCache;
+//	//std::map<int, int> lowerBoundCache;
+//	//std::map<int, int> valueCache;
+//
+//
+//	std::vector<int> validActions;
+//	game.GetValidActions(validActions);
+//
+//	int numOptions = validActions.size();
+//	int bestAction = -1;
+//	int numBetter = 0;
+//	//int greatestValue = static_cast<int>(-1e9);
+//	int bestValue = static_cast<int>(-1e9);
+//
+//	bool first = true;
+//	int end = validActions.size() - 1;
+//
+//	do
+//	{
+//		int test = NextTestScore(a, b, numOptions);
+//		if (first)
+//		{
+//			test = previousScoreTest;
+//			first = false;
+//		}
+//		//store the last test we used so we can start with it next time
+//		previousScoreTest = test;
+//
+//
+//		numBetter = 0;
+//
+//		//for (int action : validActions)
+//
+//		// loop over the relevent actions while swapping irrelevent actions out of the way
+//		end = numOptions - 1;
+//		for (int i = 0; i <= end; i++)
+//		{
+//			int action = validActions[i];
+//			auto nextState = game.Clone();
+//			nextState->Do(action);
+//
+//			// perform focused search to check if the state is valued above or below test
+//			int value = MinmaxState(*nextState, GetDepthLimit(), test - 1, test + 1);
+//
+//			if (value >= test)
+//			{
+//				numBetter++;
+//				bestAction = action;
+//
+//				if (value > bestValue)
+//				{
+//					bestValue = value;
+//				}
+//
+//				//raise the test upon finding a better lower bound
+//				if (value > test)
+//				{
+//					test = value;
+//				}
+//
+//			}
+//
+//			if (value < test)
+//			{
+//				//no longer consider the action
+//				//swap the action to the end and reduce options by 1 (end--), (i-- to prevent advancing past the swapped in action this iteration)
+//				std::swap(validActions[i--], validActions[end--]);
+//			}
+//
+//		}
+//
+//		if (bestValue < test)
+//		{
+//			b = bestValue;
+//		}
+//
+//		if (numBetter < 1)
+//		{
+//			//test value too high
+//			//nothing passed it
+//			if (test < b)
+//			{
+//				b = test;
+//			}
+//
+//		}
+//
+//		if (numBetter > 1)
+//		{
+//			//test too low
+//			//many things passed it
+//			if (test > a)
+//			{
+//				a = test;
+//			}
+//		}
+//
+//		if (numBetter > 0)
+//		{
+//			numOptions = numBetter;
+//		}
+//
+//
+//		if (bestValue == test)
+//		{
+//			//stop if the best value matches the test
+//			// if using a unit window (b=a+2) then we found the exact minmax value so we are done
+//			// if using a null window (b=a+1) then there could be a better option but this might be unlikely (not all the best so far may be truely equal)
+//			break;
+//		}
+//
+//
+//	} while ((b - a >= 2) && (numBetter != 1));
+//	//previousScoreTest = test
+//
+//
+//	if (bestAction == -1)
+//	{
+//		bestAction = validActions[0];
+//	}
+//
+//	return bestAction;
+//}

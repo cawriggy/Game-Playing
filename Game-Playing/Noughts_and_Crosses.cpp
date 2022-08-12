@@ -45,7 +45,7 @@ std::string Noughts_and_Crosses::GetDisplayActionSequenceString() const
     {
         result += "move " + std::to_string(i + 1);
         int action = ActionSequence[i];
-        game.Act(action);
+        game.Do(action);
         result += game.GetDisplayString();
     }
     return result;
@@ -59,7 +59,7 @@ bool Noughts_and_Crosses::IsValidAction(int Action) const
 }
 
 
-void Noughts_and_Crosses::Act(int Action)
+void Noughts_and_Crosses::Do(int Action)
 {
     assert(IsValidAction(Action));
     const int p = GetActivePlayer();
@@ -68,6 +68,18 @@ void Noughts_and_Crosses::Act(int Action)
     assert(TurnNumber < 9 && TurnNumber >= 0);
     BoardState[Action] = p;
     ActionSequence[TurnNumber++] = Action;
+    ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
+}
+
+
+void Noughts_and_Crosses::Undo(int Action)
+{
+    TurnNumber--;
+    assert(TurnNumber < 9 && TurnNumber >= 0);
+    assert(ActionSequence[TurnNumber] == Action);
+    const int p = GetActivePlayer();
+    assert(p == 1 || p == 2);// "invalid player number"
+    BoardState[Action] = 0; //clear the tile
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
 }
 
@@ -133,7 +145,13 @@ void Noughts_and_Crosses::GetValidActions(std::vector<int>& OutActions) const
             OutActions.push_back(Action);
         }
     }
-    //OutActions.shrink_to_fit();
+}
+
+std::vector<int> Noughts_and_Crosses::GetValidActions() const
+{
+    std::vector<int> validActions;
+    GetValidActions(validActions);
+    return validActions;
 }
 
 Game::PlayState Noughts_and_Crosses::GetPlayState() const

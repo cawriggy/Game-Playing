@@ -21,11 +21,14 @@ namespace UnitTestGamePlaying
 			gameObj.Reset();
 			for (auto action : actions)
 			{
-				gameObj.Act(action);
+				gameObj.Do(action);
 			}
 			Logger::WriteMessage(gameObj.GetDisplayString().c_str());
 			return gameObj.GetPlayState();
 		}
+
+
+		// ___  Generic Game Tests  ___
 
 		TEST_METHOD(TestStartsUnfinished)
 		{
@@ -36,18 +39,16 @@ namespace UnitTestGamePlaying
 		TEST_METHOD(TestStartsWithValidActions)
 		{
 			auto game = GameClass();
-			std::vector<int> validActions;
-			game.GetValidActions(validActions);
+			auto validActions = game.GetValidActions();
 			Assert::IsTrue(validActions.size() > 0);
 		}
 
 		TEST_METHOD(TestTakeAValidAction)
 		{
 			auto game = GameClass();
-			std::vector<int> validActions;
-			game.GetValidActions(validActions);
-			Assert::IsTrue(validActions.size() > 0);
-			game.Act(validActions[0]);
+			auto validActions = game.GetValidActions();
+			game.Do(validActions[0]); // an assert within 'Do' may cause test to abort
+			//if it works the test will pass otherwise the test may abort
 		}
 
 		TEST_METHOD(TestPlayer1Starts)
@@ -59,13 +60,19 @@ namespace UnitTestGamePlaying
 		TEST_METHOD(TestActivePlayer2After1Move)
 		{
 			auto game = GameClass();
-			std::vector<int> validActions;
-			game.GetValidActions(validActions);
-			game.Act(validActions[0]);
+			auto validActions = game.GetValidActions();
+			game.Do(validActions[0]);
 			Assert::IsTrue(game.GetActivePlayer() == 2);
 		}
 
 
+
+		// ___  Scenario Tests  ___
+		// 
+		// Board layout
+			//  0 1 2
+			//  3 4 5
+			//  6 7 8
 		TEST_METHOD(TestP1Win)
 		{
 			auto actions = { 0, 3, 1, 4, 2 };
@@ -84,17 +91,8 @@ namespace UnitTestGamePlaying
 			Assert::IsTrue(GameOutcome(actions) == Game::Tie);
 		}
 
-		
-
-		TEST_METHOD(TestThrow)
-		{
-			//throw does cause test to fail
-			//throw(11);
-		}
 
 	};
 
 
 }
-
-
