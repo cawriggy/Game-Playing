@@ -4,7 +4,7 @@ class Player_Alphabeta :
     public Player
 {
 public:
-    std::string GetName() { return "Alphabeta"; }
+    std::string GetName() { return "Alphabeta depth:" + std::to_string(GetDepthLimit()); }
     int ChooseAction(const Game& game);
 
     // depthLimit 0 means only consider the immediate action

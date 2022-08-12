@@ -14,7 +14,9 @@ public:
 	int GetActivePlayer() const;
 	int GetTurnNumber() const;
 	void GetValidActions(std::vector<int>& OutValidActions) const;
-	void Act(int Act) override;
+	std::vector<int> GetValidActions() const;
+	void Do(int Act);
+	void Undo(int Action);
 	PlayState GetPlayState() const;
 	void Reset();
 	std::unique_ptr<Game> Clone() const { return std::make_unique<Noughts_and_Crosses>(*this); }
@@ -38,24 +40,12 @@ public:
 	//   0 1 2
 	//   3 4 5
 	//   6 7 8
-	enum cell
-	{
-		topLeft,
-		topMid,
-		topRight,
-		midLeft,
-		midMid,
-		midRight,
-		botLeft,
-		botMid,
-		botRight
-	};
 
 private:
 
 	int BoardState[9] = { 0,0,0,0,0,0,0,0,0 };
 	int TurnNumber = 0;
-	int ActivePlayer = 0;
+	int ActivePlayer = 1;
 
 	const int WinGroups[8][3] =
 	{ {0,1,2}, {3,4,5}, {6,7,8}, //horizontal

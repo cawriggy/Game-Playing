@@ -9,6 +9,7 @@
 #include <time.h>
 #include <map>
 #include <stdio.h>
+#include <chrono>
 
 #include "Game.h"
 
@@ -17,6 +18,7 @@
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
 #include "Player_Minimax.h"
+#include "Player_MinmaxWMem.h"
 #include "Player_Alphabeta.h"
 #include "Player_BestNodeSearch.h"
 
@@ -31,32 +33,46 @@ int main()
     auto game = Noughts_and_Crosses();
     //auto p = Player_FirstValidAction();
     auto pRandom = Player_Random();
+    
+    int depth = 9;
+    
     auto pMinmax = Player_Minimax();
+    pMinmax.SetDepthLimit(depth);
+
+    auto pMinmaxWmem = Player_MinmaxWMem();
+    pMinmaxWmem.SetDepthLimit(depth);
+
     auto pAlphabeta = Player_Alphabeta();
+    pAlphabeta.SetDepthLimit(depth);
+
     auto pBestNode = Player_BestNodeSearch();
+    pBestNode.SetDepthLimit(depth);
 
-
+    //auto p = &pBestNode;
+    //auto p = &pAlphabeta;
+    //auto p = &pMinmax;
+    auto p = &pMinmaxWmem;
+    
     int n = 100;
     std::map<Game::PlayState, int> counts;
-    c.PlayNGames(game, pRandom, pRandom, n, counts);
+
+    //time the process
+    typedef std::chrono::steady_clock Clock;
+    for (int i = 0; i < 5; i++)
+    {
+        auto last = Clock::now();
+
+        //play some games
+        counts.clear();
+        c.PlayNGames(game, pRandom, *p, n, counts);
+
+        auto time = Clock::now();
+        auto diff = std::chrono::duration<double, std::milli >(time - last).count();
+        std::cout << diff << " ms\n";
+    }
     
-    //counts.clear();
-    //c.PlayNGames(game, pMinmax, pRandom, n, counts);
-    //
-    //counts.clear();
-    //c.PlayNGames(game, pRandom, pMinmax, n, counts);
-
-    counts.clear();
-    c.PlayNGames(game, pAlphabeta, pRandom, n, counts);
-
-    counts.clear();
-    c.PlayNGames(game, pRandom, pAlphabeta, n, counts);
-
-    counts.clear();
-    c.PlayNGames(game, pBestNode, pRandom, n, counts);
-
-    counts.clear();
-    c.PlayNGames(game, pRandom, pBestNode, n, counts);
+    
+    ////wait for keypress before closing (to keep release exe terminal open)
     //auto qq = getchar();
     
 }

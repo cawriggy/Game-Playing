@@ -33,7 +33,7 @@ int Player_Alphabeta::ChooseAction(const Game& game)
 	for (int action : validActions)
 	{
 		auto nextState = game.Clone();
-		nextState->Act(action);
+		nextState->Do(action);
 
 		int score = MinmaxState(*nextState, depthLimit, a, b);
 
@@ -95,7 +95,8 @@ int Player_Alphabeta::ScoreUpperBound(const Game& game) const
 //score a possibly non-terminal state
 int Player_Alphabeta::ScoreState(Game& game) const
 {
-	PlayoutState(game);
+	//PlayoutState(game);
+	if (game.GetPlayState() == Game::Unfinished) { return 0; }
 	return ScoreTerminalState(game);
 }
 
@@ -105,7 +106,7 @@ void Player_Alphabeta::PlayoutState(Game& game) const
 {
 	while (game.GetPlayState() == Game::Unfinished)
 	{
-		game.Act(PlayoutPolicy(game));
+		game.Do(PlayoutPolicy(game));
 	}
 }
 
@@ -150,14 +151,19 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 			return bestScore;
 		}
 		
-		std::vector<int> validActions;
-		game.GetValidActions(validActions);
-		for (int action : validActions)
+		//std::vector<int> validActions;
+		//game.GetValidActions(validActions);
+		
+		for (int action : game.GetValidActions())
 		{
-			auto nextState = game.Clone();
-			nextState->Act(action);
+			//auto nextState = game.Clone();
+			//nextState->Do(action);
+			//using nextState = game;
 
-			int score = MinmaxState(*nextState, depth - 1, a, b);
+			//int score = MinmaxState(*nextState, depth - 1, a, b);
+			game.Do(action);
+			int score = MinmaxState(game, depth - 1, a, b);
+			game.Undo(action);
 
 			if (score >= b)
 			{
@@ -183,6 +189,7 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 				bestScore = score;
 			}
 
+
 			
 		}
 		// best score might be less than a 'a' (i.e. if all possible scores were less than 'a')
@@ -203,14 +210,18 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 			return bestScore;
 		}
 
-		std::vector<int> validActions;
-		game.GetValidActions(validActions);
-		for (int action : validActions)
-		{
-			auto nextState = game.Clone();
-			nextState->Act(action);
+		//std::vector<int> validActions;
+		//game.GetValidActions(validActions);
 
-			int score = MinmaxState(*nextState, depth - 1, a, b);
+		for (int action : game.GetValidActions())
+		{
+			//auto nextState = game.Clone();
+			//nextState->Do(action);
+			//int score = MinmaxState(*nextState, depth - 1, a, b);
+
+			game.Do(action);
+			int score = MinmaxState(game, depth - 1, a, b);
+			game.Undo(action);
 
 			if (score <= a)
 			{

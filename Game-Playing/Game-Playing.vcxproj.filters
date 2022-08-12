@@ -42,6 +42,9 @@
     <ClCompile Include="Player_BestNodeSearch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Player_MinmaxWMem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Game_Connect4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Player_BestNodeSearch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_MinmaxWMem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game_Connect4.h">

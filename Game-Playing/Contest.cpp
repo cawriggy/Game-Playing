@@ -2,41 +2,26 @@
 #include <assert.h>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 
 Game::PlayState Contest::PlayGame(Game& game, Player& p1, Player& p2)
 {
+    //assert(&p1 != &p2); //the players may need to be distinct (to get the correct player number)
     game.Reset();
     p1.SetPlayerId(1);
     p2.SetPlayerId(2);
 
-    //while (game.GetPlayState() == Game::PlayState::Unfinished){}
-    int ActionLimit = 1000;
-    for (int i = 0; i < ActionLimit; i++)
-    { 
-        if (game.GetPlayState() != Game::PlayState::Unfinished)
-        {
-            return game.GetPlayState();
-        }
+    while (game.GetPlayState() == Game::PlayState::Unfinished)
+    {
         int Action = (game.GetActivePlayer() == 1) ? p1.ChooseAction(game) : p2.ChooseAction(game);
-        game.Act(Action);
+        game.Do(Action);
     }
-    bool ActionLimitReached = true;
-    assert(!ActionLimitReached);
     return game.GetPlayState();
 }
 
 void Contest::PlayNGames(Game& game, Player& p1, Player& p2, int n, std::map<Game::PlayState, int>& OutCounts)
 {
-    //begin count at 0
-    OutCounts.insert_or_assign(Game::Tie, 0);
-    OutCounts.insert_or_assign(Game::Player1Wins, 0);
-    OutCounts.insert_or_assign(Game::Player2Wins, 0);
-
-   /* OutCounts.emplace(Game::Tie, 0);
-    OutCounts.emplace(Game::Player1Wins, 0);
-    OutCounts.emplace(Game::Player2Wins, 0);*/
-
     for (int i = 0; i < n; i++)
     {
         Game::PlayState Outcome = PlayGame(game, p1, p2);
@@ -44,15 +29,12 @@ void Contest::PlayNGames(Game& game, Player& p1, Player& p2, int n, std::map<Gam
         OutCounts[Outcome]++;
     }
 
-
-#define NAME(o) '\'' << o.GetName() << '\''
-
     //print results
+#define NAME(o) '\'' << o.GetName() << '\''
     std::cout << NAME(p1) << "  VS  " << NAME(p2) << '\n';
     std::cout << n << " games of " << NAME(game) << '\n';
     std::cout << OutCounts[Game::Tie] << " Ties\n";
     std::cout << OutCounts[Game::Player1Wins] << " wins for player 1\n";
     std::cout << OutCounts[Game::Player2Wins] << " wins for player 2\n" << std::endl;
-
 #undef NAME
 }
