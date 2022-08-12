@@ -66,9 +66,11 @@ void Game_Connect4::Do(int Action)
     const int p = GetActivePlayer();
     assert(p == 1 || p == 2);// "invalid player number"
     assert(TurnNumber < 42 && TurnNumber >= 0);
+
     int row = 5;
     while (BoardState[row * 7 + Action])
         row--;
+
     BoardState[row * 7 + Action] = p; // fill from bottom
     ActionSequence[TurnNumber++] = Action;
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
@@ -82,12 +84,13 @@ void Game_Connect4::Undo(int Action)
     const int p = GetActivePlayer();
     assert(p == 1 || p == 2);// "invalid player number"
 
-    int row = 5;
-    while (BoardState[row * 7 + Action])
+    //scan from the top to a non empty cell
+    assert(BoardState[5 * 7 + Action] != 0); // check bottom cell is not empty (so while loop will correctly terminate)
+    int row = 0;
+    while (BoardState[row * 7 + Action] == 0)
     {
-        row--;
+        row++;
     }
-    row++; //go back one space
 
     BoardState[row * 7 + Action] = 0; // clear from to top
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2

@@ -14,7 +14,10 @@
 #include "Game.h"
 
 #include "Contest.h"
+
 #include "Noughts_and_Crosses.h"
+#include "Game_Connect4.h"
+
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
 #include "Player_Minimax.h"
@@ -30,11 +33,12 @@ int main()
     srand((unsigned int)time(0));
 
     Contest c = Contest();
-    auto game = Noughts_and_Crosses();
+    //auto game = Noughts_and_Crosses();
+    auto game = Game_Connect4();
     //auto p = Player_FirstValidAction();
     auto pRandom = Player_Random();
     
-    int depth = 9;
+    int depth = 3;
     
     auto pMinmax = Player_Minimax();
     pMinmax.SetDepthLimit(depth);
@@ -49,9 +53,9 @@ int main()
     pBestNode.SetDepthLimit(depth);
 
     //auto p = &pBestNode;
-    //auto p = &pAlphabeta;
+    auto p = &pAlphabeta;
     //auto p = &pMinmax;
-    auto p = &pMinmaxWmem;
+    //auto p = &pMinmaxWmem;
     
     int n = 100;
     std::map<Game::PlayState, int> counts;
