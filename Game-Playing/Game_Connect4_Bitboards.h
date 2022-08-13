@@ -34,7 +34,8 @@ public:
 
 	Game_Connect4_Bitboards();
 	bool IsWinningState() const;
-	const int AllActions[7] = { 0,1,2,3,4,5,6 };
+	const int AllActions[7] = { 3,4,2,5,1,6,0 }; //centre first
+	//const int AllActions[7] = { 0,1,2,3,4,5,6 };
 
 	// validation
 	bool IsValidAction(int Action) const;

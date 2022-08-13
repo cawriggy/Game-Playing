@@ -40,7 +40,7 @@ int main()
     //auto p = Player_FirstValidAction();
     auto pRandom = Player_Random();
     
-    int depth = 10;
+    int depth = 12;
     
     auto pMinmax = Player_Minimax();
     pMinmax.SetDepthLimit(depth);
