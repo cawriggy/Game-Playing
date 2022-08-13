@@ -40,7 +40,7 @@ int main()
     //auto p = Player_FirstValidAction();
     auto pRandom = Player_Random();
     
-    int depth = 12;
+    int depth = 5;
     
     auto pMinmax = Player_Minimax();
     pMinmax.SetDepthLimit(depth);
@@ -63,7 +63,7 @@ int main()
     //auto p = &pMinmaxWmem;
     //auto p = &pRandom;
     
-    int n = 1;
+    int n = 100;
     std::map<Game::PlayState, int> counts;
 
     //time the process
