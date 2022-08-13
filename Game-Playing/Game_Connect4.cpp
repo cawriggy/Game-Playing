@@ -58,20 +58,27 @@ bool Game_Connect4::IsValidAction(int Action) const
 
 void Game_Connect4::Do(int Action) 
 {
+    const int p = GetActivePlayer();
+    int col = Action;
+    int row = 5;
+    int empty = 0;
+
     assert(IsValidAction(Action));
     if (!(GetPlayState() == Game::Unfinished)) 
     { 
         throw("can't act as game already finished"); 
     }
-    const int p = GetActivePlayer();
     assert(p == 1 || p == 2);// "invalid player number"
     assert(TurnNumber < 42 && TurnNumber >= 0);
+    assert(GetCell(  0, col) == empty);
 
-    int row = 5;
-    while (BoardState[row * 7 + Action])
+    // fill from bottom
+    while (GetCell(row, col) != empty)
+    {
         row--;
+    }
+    SetCell(row, col, p);
 
-    BoardState[row * 7 + Action] = p; // fill from bottom
     ActionSequence[TurnNumber++] = Action;
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
 }
@@ -79,20 +86,23 @@ void Game_Connect4::Do(int Action)
 void Game_Connect4::Undo(int Action)
 {
     TurnNumber--;
+    const int p = GetActivePlayer();
+    int row = 0;
+    int col = Action;
+    int empty = 0;
+
     assert(TurnNumber < 42 && TurnNumber >= 0);
     assert(ActionSequence[TurnNumber] == Action);
-    const int p = GetActivePlayer();
     assert(p == 1 || p == 2);// "invalid player number"
 
-    //scan from the top to a non empty cell
-    assert(BoardState[5 * 7 + Action] != 0); // check bottom cell is not empty (so while loop will correctly terminate)
-    int row = 0;
-    while (BoardState[row * 7 + Action] == 0)
+    //empty the topmost non-empty cell in the column
+    assert(GetCell(  5, col) != empty);
+    while (GetCell(row, col) == empty)
     {
         row++;
     }
+    SetCell(row, col, 0);
 
-    BoardState[row * 7 + Action] = 0; // clear from to top
     ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
 }
 
@@ -151,7 +161,7 @@ int Game_Connect4::GetTurnNumber() const
 
 void Game_Connect4::GetValidActions(std::vector<int>& OutActions) const 
 {
-    OutActions.reserve(42);
+    OutActions.reserve(7);
     for (int Action : AllActions)
     {
         if (IsValidAction(Action))

@@ -45,8 +45,10 @@ public:
 
 
 private:
-
 	int BoardState[42] = { 0 };
+	int cellIndex(int row, int col) { return row * 7 + col; }
+	void SetCell(int row, int col, int p) { BoardState[cellIndex(row, col)] = p; }
+	int GetCell(int row, int col) { return BoardState[cellIndex(row, col)]; }
 	int TurnNumber = 0;
 	int ActivePlayer = 1;
 	int ActionSequence[42] = { 0 };

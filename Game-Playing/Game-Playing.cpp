@@ -56,6 +56,7 @@ int main()
     auto p = &pAlphabeta;
     //auto p = &pMinmax;
     //auto p = &pMinmaxWmem;
+    //auto p = &pRandom;
     
     int n = 100;
     std::map<Game::PlayState, int> counts;
