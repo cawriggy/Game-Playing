@@ -17,6 +17,7 @@
 
 #include "Noughts_and_Crosses.h"
 #include "Game_Connect4.h"
+#include "Game_Connect4_Bitboards.h"
 
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
@@ -34,11 +35,12 @@ int main()
 
     Contest c = Contest();
     //auto game = Noughts_and_Crosses();
-    auto game = Game_Connect4();
+    //auto game = Game_Connect4();
+    auto game = Game_Connect4_Bitboards();
     //auto p = Player_FirstValidAction();
     auto pRandom = Player_Random();
     
-    int depth = 3;
+    int depth = 10;
     
     auto pMinmax = Player_Minimax();
     pMinmax.SetDepthLimit(depth);
@@ -49,6 +51,9 @@ int main()
     auto pAlphabeta = Player_Alphabeta();
     pAlphabeta.SetDepthLimit(depth);
 
+    auto pAlphabeta2 = Player_Alphabeta();
+    pAlphabeta2.SetDepthLimit(depth);
+
     auto pBestNode = Player_BestNodeSearch();
     pBestNode.SetDepthLimit(depth);
 
@@ -58,7 +63,7 @@ int main()
     //auto p = &pMinmaxWmem;
     //auto p = &pRandom;
     
-    int n = 100;
+    int n = 1;
     std::map<Game::PlayState, int> counts;
 
     //time the process
@@ -70,6 +75,9 @@ int main()
         //play some games
         counts.clear();
         c.PlayNGames(game, pRandom, *p, n, counts);
+
+        //counts.clear();
+        //c.PlayNGames(game, pAlphabeta2, *p, n, counts);
 
         auto time = Clock::now();
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();
