@@ -1,8 +1,10 @@
 #include "Contest.h"
+#include "Game.h"
 #include <assert.h>
 #include <iostream>
 #include <vector>
 #include <chrono>
+
 
 
 Game::PlayState Contest::PlayGame(Game& game, Player& p1, Player& p2)

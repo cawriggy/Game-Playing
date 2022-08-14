@@ -25,8 +25,17 @@ void Game_Mancala::DisplayActionSequence() const
 
 std::string Game_Mancala::GetDisplayString() const
 {
-    //display the board as text, oriented to active player
-    auto cupString = [this](int i) {int n = BoardState[i]; return std::to_string(n) + ((n < 10) ? " " : ""); };
+    //display the board as text
+    std::vector<int> BoardStateCopy = GetStateVector();
+    if (GetActivePlayer() == 2)
+    {
+        for (int i = 0; i < 14; i++)
+        {
+            BoardStateCopy[i] = BoardState[(i + 7) % 14];
+        }
+    }
+    
+    auto cupString = [BoardStateCopy](int i) {int n = BoardStateCopy[i]; return std::to_string(n) + ((n < 10) ? " " : ""); };
 
     std::string player = std::to_string(GetActivePlayer());
     
@@ -70,7 +79,6 @@ bool Game_Mancala::IsValidAction(int Action) const
 {
     const int i = Action; 
     if (i > 5 || 0 > i) return false;
-    if (BoardState[i] == 0) return false;
     return BoardState[i] != 0;
 }
 
@@ -104,30 +112,23 @@ void Game_Mancala::Do(int Action)
 
     if (cup != 6) // did not finish in players mancala
     { 
-        SwitchPlayer();
+        SwitchBoard();
+        ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
     }
     
 }
 
 void Game_Mancala::Undo(int Action) //TODO
 {
-    //TurnNumber--;
-    //const int p = GetActivePlayer();
-    //int row = 0;
-    //int col = Action;
-    //int empty = 0;
+    TurnNumber--;
+    const int p = GetActivePlayer();
+    int cup = Action;
 
-    //assert(TurnNumber < 42 && TurnNumber >= 0);
-    //assert(ActionSequence[TurnNumber] == Action);
-    //assert(p == 1 || p == 2);// "invalid player number"
+    assert(TurnNumber >= 0);
+    assert(ActionSequence[TurnNumber] == Action);
+    assert(p == 1 || p == 2);// "invalid player number"
 
-    ////empty the topmost non-empty cell in the column
-    //assert(GetCell(5, col) != empty);
-    //while (GetCell(row, col) == empty)
-    //{
-    //    row++;
-    //}
-    //SetCell(row, col, 0);
+    //TODO
 
     //ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
 }
@@ -175,6 +176,7 @@ Game::PlayState Game_Mancala::GetPlayState() const
     GetValidActions(validActions);
     if (validActions.empty()) // Game over 
     { 
+        assert(validActions.size() == 0);
         int active_player_mancala = BoardState[6];
         // sweep remaining into opponents mancala
         int opponent_mancala = BoardState[13];
@@ -183,12 +185,15 @@ Game::PlayState Game_Mancala::GetPlayState() const
             opponent_mancala += BoardState[i];
         }
         assert(opponent_mancala + active_player_mancala == 48);
-        if (active_player_mancala != opponent_mancala)
+        if (active_player_mancala != opponent_mancala) // not a tie
         {
-            int NextToAct = GetActivePlayer();
             if (active_player_mancala > opponent_mancala)
             {
-                return NextToAct == 1 ? Player1Wins : Player2Wins;
+                return GetActivePlayer() == 1 ? Player1Wins : Player2Wins;
+            }
+            else
+            {
+                return GetActivePlayer() == 1 ? Player2Wins : Player1Wins;
             }
         }
         return Tie;

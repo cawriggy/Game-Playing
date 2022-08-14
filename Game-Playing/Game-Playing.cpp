@@ -17,6 +17,7 @@
 
 #include "Noughts_and_Crosses.h"
 #include "Game_Connect4.h"
+#include "Game_Mancala.h"
 
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
@@ -34,8 +35,9 @@ int main()
 
     Contest c = Contest();
     //auto game = Noughts_and_Crosses();
-    auto game = Game_Connect4();
-    //auto p = Player_FirstValidAction();
+    //auto game = Game_Connect4();
+    auto game = Game_Mancala();
+    auto pFirst = Player_FirstValidAction();
     auto pRandom = Player_Random();
     
     int depth = 3;
@@ -69,7 +71,8 @@ int main()
 
         //play some games
         counts.clear();
-        c.PlayNGames(game, pRandom, *p, n, counts);
+//        c.PlayNGames(game, pRandom, *p, n, counts);
+        c.PlayNGames(game, pRandom, pFirst, n, counts);
 
         auto time = Clock::now();
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();

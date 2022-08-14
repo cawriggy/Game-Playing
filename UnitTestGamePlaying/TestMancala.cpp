@@ -148,8 +148,11 @@ namespace UnitTestGamePlaying
 
 		TEST_METHOD(TestBeadCapture)
 		{
-			auto actions = { 5, 1, 0, 0, 2, 1, 3, 2, 0, 0, 5 };
 			Logger::WriteMessage("Test Bead Capture");
+			auto init_actions = { 5, 1, 0, 0, 2, 1, 3, 2, 0, 0};
+			std::vector<int> initState = GameState(init_actions);
+			auto actions = { 5, 1, 0, 0, 2, 1, 3, 2, 0, 0, 5};
+			Logger::WriteMessage("Play cup 5");
 			std::vector<int> newState = GameState(actions);
 			std::vector<int> expectedNewState = {1,3,2,9,8,0,4,1,3,2,0,8,0,7};
 			Assert::IsTrue(newState == expectedNewState);
@@ -165,6 +168,11 @@ namespace UnitTestGamePlaying
 			auto contest = Contest();
 			std::map<Game::PlayState, int> counts;
 			contest.PlayNGames(game, player1Random, player2Random, 100, counts);
+			std::string results = "Results: ";
+			results += "Wins for 1: " + std::to_string(counts[Game::Player1Wins]);
+			results += ", Wins for 2: " + std::to_string(counts[Game::Player2Wins]);
+			results += ", Ties: " + std::to_string(counts[Game::Tie]);
+			Logger::WriteMessage(results.c_str());
 			Assert::IsTrue(counts[Game::Player1Wins] + counts[Game::Player2Wins] + counts[Game::Tie] == 100);
 		}
 	};

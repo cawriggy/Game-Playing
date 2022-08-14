@@ -52,9 +52,8 @@ private:
 //	void EmptyCup(int cup) { BoardState[cup] = 0; }
 //	int GetCup(int cup) { return BoardState[cup]; }
 	int PickUpBeads(int cup) { int beads = BoardState[cup]; BoardState[cup] = 0; return beads; }
-	void SwitchPlayer() {
-		ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
-		// switch board round
+	void SwitchBoard() 
+	{
 		std::vector<int> BoardStateCopy = GetStateVector();
 		for (int i = 0; i < 14; i++)
 		{
