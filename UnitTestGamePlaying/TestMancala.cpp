@@ -99,7 +99,7 @@ namespace UnitTestGamePlaying
 			int action = 3;
 			auto game = GameClass();
 			game.Do(action);
-			std::vector<int> expectedNewState = { 5, 4, 4, 4, 4, 4, 0, 4, 4, 4, 0, 5, 5, 1 };
+			std::vector<int> expectedNewState = { 4, 4, 4, 0, 5, 5, 1, 5, 4, 4, 4, 4, 4, 0,2 };
 			std::vector<int> newState = game.GetStateVector();
 			Assert::IsTrue(newState == expectedNewState);
 		}
@@ -154,7 +154,7 @@ namespace UnitTestGamePlaying
 			auto actions = { 5, 1, 0, 0, 2, 1, 3, 2, 0, 0, 5};
 			Logger::WriteMessage("Play cup 5");
 			std::vector<int> newState = GameState(actions);
-			std::vector<int> expectedNewState = {1,3,2,9,8,0,4,1,3,2,0,8,0,7};
+			std::vector<int> expectedNewState = {1,3,2,9,8,0,4,1,3,2,0,8,0,7, 1};
 			Assert::IsTrue(newState == expectedNewState);
 		}
 

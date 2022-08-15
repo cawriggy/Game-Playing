@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <array>
+#include <set>
 #include "Game.h"
 #include <string>
 
@@ -28,7 +30,7 @@ public:
 	std::string GetDisplayString() const;
 	std::string GetDisplayActionSequenceString() const;
 
-	const int AllActions[6] = { 0,1,2,3,4,5 }; 
+	const std::array<int,6> AllActions = { 0,1,2,3,4,5 };
 
 	// validation
 	bool IsValidAction(int Action) const;
@@ -46,24 +48,18 @@ public:
 	
 
 private:
-	int BoardState[14] = { 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0 }; 
-
-	//void FillCup(int cup, int p) { BoardState[cup] += p; }
-//	void EmptyCup(int cup) { BoardState[cup] = 0; }
-//	int GetCup(int cup) { return BoardState[cup]; }
-	int PickUpBeads(int cup) { int beads = BoardState[cup]; BoardState[cup] = 0; return beads; }
-	void SwitchBoard() 
-	{
-		std::vector<int> BoardStateCopy = GetStateVector();
-		for (int i = 0; i < 14; i++)
-		{
-			BoardState[i] = BoardStateCopy[(i + 7) % 14];
-		}
-	}
-	
+	std::array<int,14>  BoardState = { 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0 };
+	std::set<int> Player1Cups= { 0,1,2,3,4,5 };
+	std::set<int> Player2Cups = { 7,8,9,10,11,12 };
 	int TurnNumber = 0;
 	int ActivePlayer = 1;
-	int ActionSequence[1000] = { 0 }; // assumes < 1000 actions til game ends
+	int PlayerMancalaCupIx = 6;  // active players mancala
+	int OpponentMancalaCupIx = 13;
+	std::array<int, 1000> ActionSequence = { 0 }; // assumes < 1000 actions til game ends
+
+	int ActivePlayerScore() const { return BoardState[PlayerMancalaCupIx]; }
+	int OpponentScore() const { return BoardState[OpponentMancalaCupIx]; }
+	
 
 };
 

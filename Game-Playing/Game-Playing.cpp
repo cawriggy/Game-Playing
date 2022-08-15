@@ -71,8 +71,8 @@ int main()
 
         //play some games
         counts.clear();
-//        c.PlayNGames(game, pRandom, *p, n, counts);
-        c.PlayNGames(game, pRandom, pFirst, n, counts);
+ //       c.PlayNGames(game, pRandom, *p, n, counts);
+        c.PlayNGames(game, pRandom, pRandom, n, counts);
 
         auto time = Clock::now();
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();

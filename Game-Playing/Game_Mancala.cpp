@@ -2,6 +2,8 @@
 #include <iostream>
 #include <assert.h>
 #include <vector>
+#include <array>
+#include <set>
 
 /*
     Mancala Rules
@@ -25,36 +27,29 @@ void Game_Mancala::DisplayActionSequence() const
 
 std::string Game_Mancala::GetDisplayString() const
 {
-    //display the board as text
-    std::vector<int> BoardStateCopy = GetStateVector();
-    if (GetActivePlayer() == 2)
-    {
-        for (int i = 0; i < 14; i++)
-        {
-            BoardStateCopy[i] = BoardState[(i + 7) % 14];
-        }
-    }
+    //display the board as text with Player 2 at top, Player 1 below
     
-    auto cupString = [BoardStateCopy](int i) {int n = BoardStateCopy[i]; return std::to_string(n) + ((n < 10) ? " " : ""); };
+    auto stateString = [this](int i) { int n = BoardState[i]; return std::to_string(n) + ((n < 10) ? " " : ""); };
 
     std::string player = std::to_string(GetActivePlayer());
-    
-    std::string opponent_mancala = cupString(13);
-    std::string opponent_cups;
+
+    std::string player1_mancala = stateString(6);
+    std::string player2_mancala = stateString(13);
+    std::string player2_cups;
     for (int i = 12; i > 6; i--)
     {
-        opponent_cups += "  " + cupString(i);
+        player2_cups += "  " + stateString(i);
     };
-    std::string player_cups;
+    std::string player1_cups;
     for (int i = 0; i < 6; i++)
     {
-        player_cups += "  " + cupString(i);
+        player1_cups += "  " + stateString(i);
     };
-    std::string player_mancala = " " + cupString(6);
+    
 
     std::string s = "\n---       Player " + player + " to play      ---\n" +
-        " " + opponent_mancala + " |" + opponent_cups + " |\n" +
-        "    |" + player_cups   + " | " + player_mancala + "\n\n";
+        " " + player2_mancala + " |" + player2_cups + " |\n" +
+        "    |" + player1_cups   + " |  " + player1_mancala + "\n\n";
     return s;
 }
 
@@ -77,60 +72,64 @@ std::string Game_Mancala::GetDisplayActionSequenceString() const
 
 bool Game_Mancala::IsValidAction(int Action) const
 {
-    const int i = Action; 
-    if (i > 5 || 0 > i) return false;
-    return BoardState[i] != 0;
+    const int i = Action;
+    if (0 > i || i > 5) // actions selected 0 - 5
+    {
+        return false;
+    }
+    int cupIx = (GetActivePlayer() == 1) ? i : i + 7;
+    return (BoardState[cupIx] != 0);
 }
 
 void Game_Mancala::Do(int Action) 
 {
-    int cup = Action;
+    int action = Action;
 
     assert(IsValidAction(Action));
     assert(TurnNumber < 1000 && TurnNumber >= 0);
 
+    int cupIx = (GetActivePlayer() == 1) ? action : action + 7;
+
     //pick up beads from the chosen cup
-    int held = PickUpBeads(cup);
+    int held = BoardState[cupIx]; 
+    BoardState[cupIx] = 0;
     // distribute beads
     while (held > 0)
     {
-        // advance by 1 but loop back at opponents mancala
-        cup = (cup + 1) % 13;
+        // advance by 1 looping round the board
+        cupIx = (cupIx + 1) % 14;
         // drop a bead
-        held -= 1;
-        BoardState[cup] += 1;
+        if (cupIx != OpponentMancalaCupIx)
+        {
+            held -= 1;
+            BoardState[cupIx] += 1;
+        }
     }
     // capture if last bead dropped in an empty cup on players side
-    if (BoardState[cup] == 1 && cup < 6)
+    if (BoardState[cupIx] == 1)
     {
-        int opponent_cup = 12 - cup;
-        BoardState[6] += BoardState[opponent_cup];
-        BoardState[opponent_cup] = 0;
-    }
-
-    ActionSequence[TurnNumber++] = Action;
-
-    if (cup != 6) // did not finish in players mancala
-    { 
-        SwitchBoard();
-        ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
+        if ( (GetActivePlayer() == 1 && Player1Cups.contains(cupIx)) || (GetActivePlayer() == 2 && Player2Cups.contains(cupIx)) )
+        {
+            int opposite_cupIx = 12 - cupIx;
+            BoardState[PlayerMancalaCupIx] += BoardState[opposite_cupIx];
+            BoardState[opposite_cupIx] = 0;
+        }
     }
     
+    ActionSequence[TurnNumber++] = Action;
+
+    if (cupIx != PlayerMancalaCupIx) // end of turn
+    { 
+        ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
+        PlayerMancalaCupIx = 6 + 13 - PlayerMancalaCupIx;
+        OpponentMancalaCupIx = 6 + 13 - OpponentMancalaCupIx;
+    }
+
 }
 
 void Game_Mancala::Undo(int Action) //TODO
 {
-    TurnNumber--;
-    const int p = GetActivePlayer();
-    int cup = Action;
-
-    assert(TurnNumber >= 0);
-    assert(ActionSequence[TurnNumber] == Action);
-    assert(p == 1 || p == 2);// "invalid player number"
-
-    //TODO
-
-    //ActivePlayer = 3 - ActivePlayer; //switch between 1 and 2
+    assert(false);
 }
 
 
@@ -177,17 +176,28 @@ Game::PlayState Game_Mancala::GetPlayState() const
     if (validActions.empty()) // Game over 
     { 
         assert(validActions.size() == 0);
-        int active_player_mancala = BoardState[6];
+        int active_player_score = ActivePlayerScore();
+        int opponent_score = OpponentScore();
         // sweep remaining into opponents mancala
-        int opponent_mancala = BoardState[13];
-        for (int i = 7; i < 13; i++)
+        if (GetActivePlayer() == 1)
         {
-            opponent_mancala += BoardState[i];
+            for (int i = 7; i < 13; i++)
+            {
+                opponent_score += BoardState[i];
+            }
         }
-        assert(opponent_mancala + active_player_mancala == 48);
-        if (active_player_mancala != opponent_mancala) // not a tie
+        else
         {
-            if (active_player_mancala > opponent_mancala)
+            for (int i = 0; i < 6; i++)
+            {
+                opponent_score += BoardState[i];
+            }
+        }
+        
+        assert(opponent_score + active_player_score == 48);
+        if (active_player_score != opponent_score) // not a tie
+        {
+            if (active_player_score > opponent_score)
             {
                 return GetActivePlayer() == 1 ? Player1Wins : Player2Wins;
             }
@@ -206,6 +216,9 @@ void Game_Mancala::Reset()
 {
     TurnNumber = 0;
     ActivePlayer = 1;
+    PlayerMancalaCupIx = 6;  // active players mancala
+    OpponentMancalaCupIx = 13;
+    ActionSequence = { 0 };
     std::fill(std::begin(BoardState), std::end(BoardState), 4);
     // empty the mancala cups
     BoardState[6] = 0; 
@@ -213,9 +226,11 @@ void Game_Mancala::Reset()
 }
 
 
-std::vector<int> Game_Mancala::GetStateVector() const 
+std::vector<int> Game_Mancala::GetStateVector() const
 {
-    return std::vector<int>(std::begin(BoardState), std::end(BoardState));
+    std::vector<int> stateVec(BoardState.begin(), BoardState.end() );
+    stateVec.push_back(GetActivePlayer());
+    return stateVec;
 }
 
 
