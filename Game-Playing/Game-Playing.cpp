@@ -27,9 +27,7 @@
 #include "Player_BestNodeSearch.h"
 #include "Player_Human.h"
 
-#include "Viewer_Connect4.h"
-
-#define assertm(exp, msg) assert(((void)msg, exp))
+//#define assertm(exp, msg) assert(((void)msg, exp))
 
 int main()
 {
