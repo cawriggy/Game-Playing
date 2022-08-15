@@ -25,64 +25,93 @@
 #include "Player_MinmaxWMem.h"
 #include "Player_Alphabeta.h"
 #include "Player_BestNodeSearch.h"
+#include "Player_Human.h"
+
+#include "Viewer_Connect4.h"
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 int main()
 {
-    //seed random with current time
-    srand((unsigned int)time(0));
+    //auto vwr = Viewer_Connect4();
+    //vwr.Do(1);
 
-    Contest c = Contest();
-    //auto game = Noughts_and_Crosses();
-    //auto game = Game_Connect4();
+
+    //play against alphabeta
     auto game = Game_Connect4_Bitboards();
-    //auto p = Player_FirstValidAction();
-    auto pRandom = Player_Random();
+    //auto game = Noughts_and_Crosses();
+    auto p1 = Player_Alphabeta();
+    p1.SetDepthLimit(8);
+    auto p2 = Player_Human();
+    auto c = Contest();
+    auto r = c.PlayGame(game, p1, p2);
     
-    int depth = 5;
-    
-    auto pMinmax = Player_Minimax();
-    pMinmax.SetDepthLimit(depth);
+    //display result
+    game.Display();
+    if (r == 0) 
+    {
+        std::cout << "tie";
+    }
+    else
+    {
+        std::cout << "winner: " << r;
+    }
 
-    auto pMinmaxWmem = Player_MinmaxWMem();
-    pMinmaxWmem.SetDepthLimit(depth);
 
-    auto pAlphabeta = Player_Alphabeta();
-    pAlphabeta.SetDepthLimit(depth);
 
-    auto pAlphabeta2 = Player_Alphabeta();
-    pAlphabeta2.SetDepthLimit(depth);
+    ////seed random with current time
+    //srand((unsigned int)time(0));
 
-    auto pBestNode = Player_BestNodeSearch();
-    pBestNode.SetDepthLimit(depth);
+    //Contest c = Contest();
+    //////auto game = Noughts_and_Crosses();
+    //////auto game = Game_Connect4();
+    //auto game = Game_Connect4_Bitboards();
+    //////auto p = Player_FirstValidAction();
+    //auto pRandom = Player_Random();
+    //
+    //int depth = 5;
+    //
+    //auto pMinmax = Player_Minimax();
+    //pMinmax.SetDepthLimit(depth);
+
+    //auto pMinmaxWmem = Player_MinmaxWMem();
+    //pMinmaxWmem.SetDepthLimit(depth);
+
+    //auto pAlphabeta = Player_Alphabeta();
+    //pAlphabeta.SetDepthLimit(depth);
+
+    //auto pAlphabeta2 = Player_Alphabeta();
+    //pAlphabeta2.SetDepthLimit(depth);
+
+    //auto pBestNode = Player_BestNodeSearch();
+    //pBestNode.SetDepthLimit(depth);
 
     //auto p = &pBestNode;
-    auto p = &pAlphabeta;
+    //auto p = &pAlphabeta;
     //auto p = &pMinmax;
     //auto p = &pMinmaxWmem;
     //auto p = &pRandom;
     
-    int n = 100;
-    std::map<Game::PlayState, int> counts;
+    //int n = 1000;
+    //std::map<Game::PlayState, int> counts;
 
-    //time the process
-    typedef std::chrono::steady_clock Clock;
-    for (int i = 0; i < 5; i++)
-    {
-        auto last = Clock::now();
+    ////time the process
+    //typedef std::chrono::steady_clock Clock;
+    //for (int i = 0; i < 5; i++)
+    //{
+    //    auto last = Clock::now();
 
-        //play some games
-        counts.clear();
-        c.PlayNGames(game, pRandom, *p, n, counts);
+    //    //play some games
+    //    counts.clear();
+    //    c.PlayNGames(game, pRandom, *p, n, counts);
 
-        //counts.clear();
-        //c.PlayNGames(game, pAlphabeta2, *p, n, counts);
+    //    //counts.clear();
+    //    //c.PlayNGames(game, pAlphabeta2, *p, n, counts);
 
-        auto time = Clock::now();
-        auto diff = std::chrono::duration<double, std::milli >(time - last).count();
-        std::cout << diff << " ms\n";
-    }
+    //    auto time = Clock::now();
+    //    auto diff = std::chrono::duration<double, std::milli >(time - last).count();
+    //    std::cout << diff << " ms\n";
+    //}
     
     
     ////wait for keypress before closing (to keep release exe terminal open)
