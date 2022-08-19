@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include <vector>
 #include "../Game-Playing/Game_Connect4.h"
+#include "../Game-Playing/Game_Connect4_Bitboards.h"
 #include "../Game-Playing/Contest.h"
 #include "../Game-Playing/Player_Alphabeta.h"
 #include "../Game-Playing/Player_Random.h"
@@ -186,6 +187,109 @@ namespace UnitTestGamePlaying
 		}
 		
 		
+	};
+
+
+
+
+
+	TEST_CLASS(UnitTest_Connect4_Bitboards)
+	{
+	public:
+		using GameClass = Game_Connect4_Bitboards;
+
+		int GameOutcome(auto actions)
+		{
+			auto gameObj = GameClass();
+			gameObj.Reset();
+			try
+			{
+				for (auto action : actions)
+				{
+					gameObj.Do(action);
+				}
+			}
+			catch (const char* msg)
+			{
+				Logger::WriteMessage(msg);
+				Assert::IsTrue(false);
+			}
+			Logger::WriteMessage(gameObj.GetDisplayString().c_str());
+			return gameObj.GetPlayState();
+		}
+
+		TEST_METHOD(TestStartsUnfinished)
+		{
+			auto game = GameClass();
+			Assert::IsTrue(game.GetPlayState() == Game::Unfinished);
+		}
+
+		TEST_METHOD(TestStartsWithValidActions)
+		{
+			auto game = GameClass();
+			std::vector<int> validActions;
+			game.GetValidActions(validActions);
+			Assert::IsTrue(validActions.size() > 0);
+		}
+
+		TEST_METHOD(TestTakeAValidAction)
+		{
+			auto game = GameClass();
+			std::vector<int> validActions;
+			game.GetValidActions(validActions);
+			Assert::IsTrue(validActions.size() > 0);
+			game.Do(validActions[0]);
+		}
+
+		TEST_METHOD(TestPlayer1Starts)
+		{
+			auto game = GameClass();
+			Assert::IsTrue(game.GetActivePlayer() == 1);
+		}
+
+		TEST_METHOD(TestActivePlayer2After1Move)
+		{
+			auto game = GameClass();
+			std::vector<int> validActions;
+			game.GetValidActions(validActions);
+			game.Do(validActions[0]);
+			Assert::IsTrue(game.GetActivePlayer() == 2);
+		}
+
+
+		TEST_METHOD(TestP1Win)
+		{
+			auto actions = { 3, 0, 2, 0, 1, 6, 4 };
+			Logger::WriteMessage("Test player 1 wins");
+			Assert::IsTrue(GameOutcome(actions) == Game::Player1Wins);
+		}
+
+
+		TEST_METHOD(TestP2Win)
+		{
+			auto actions = { 0, 3, 2, 3, 2, 3,1,3 };
+			Logger::WriteMessage("Test player 2 wins");
+			Assert::IsTrue(GameOutcome(actions) == Game::Player2Wins);
+		}
+
+
+		TEST_METHOD(TestWinOnDiagonal)
+		{
+			auto actions = { 0, 3, 1, 3, 2, 4, 2, 4,3,4,4 };
+			Logger::WriteMessage("Test player 1 wins on diagonal");
+			Assert::IsTrue(GameOutcome(actions) == Game::Player1Wins);
+		}
+
+		TEST_METHOD(TestTie)
+		{
+			auto actions = { 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6,
+					1, 0, 3, 2, 5, 4, 0, 6, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6 };
+			Logger::WriteMessage("Test a Tie");
+			Assert::IsTrue(GameOutcome(actions) == Game::Tie);
+
+		}
+
+
 	};
 
 

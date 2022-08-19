@@ -299,6 +299,18 @@ namespace UnitTestGamePlaying
 		}
 
 
+		TEST_METHOD(Test_unpack)
+		{
+			std::tuple<int, int> arr[] = { {0,1}, {2,3} };
+			for (const auto& [a, b] : arr)
+			{
+				Logger::WriteMessage(std::format("{} {}\n", a, b).c_str());
+			}
+
+
+		}
+
+
 	};
 
 }
