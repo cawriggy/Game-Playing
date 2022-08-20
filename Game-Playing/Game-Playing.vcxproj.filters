@@ -51,6 +51,9 @@
     <ClCompile Include="Game_Mancala.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Player_Alphabeta_Mancala.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game_Mancala.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_Alphabeta_Mancala.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -106,6 +106,7 @@ void Game_Mancala::Do(int Action)
         }
     }
     // capture if last bead dropped in an empty cup on players side
+    assert(0 <= cupIx && cupIx <= (14 - 1));
     if (BoardState[cupIx] == 1)
     {
         if ( (GetActivePlayer() == 1 && Player1Cups.contains(cupIx)) || (GetActivePlayer() == 2 && Player2Cups.contains(cupIx)) )
@@ -129,7 +130,8 @@ void Game_Mancala::Do(int Action)
 
 void Game_Mancala::Undo(int Action) //TODO
 {
-    assert(false);
+    bool CanUndo = false;
+    assert(CanUndo);
 }
 
 

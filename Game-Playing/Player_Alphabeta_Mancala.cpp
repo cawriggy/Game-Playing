@@ -1,26 +1,15 @@
-//player_alphabeta.cpp
-// implements alphabeta pruning for faster minmax evaluations
-
-//could be optimised further by:
-// better move ordering, e.g. by iterative deepening
-// caching results
-// null window searches
-// using a negamax version for zero-sum games?
-
-
-#include "Player_Alphabeta.h"
+#include "Player_Alphabeta_Mancala.h"
+#include "Game_Mancala.h"
 #include <assert.h>
-#include <cstdlib> //for rand (in playout policy)
-
 
 /// <summary>
 /// Choose an action to win as early as possible or lose as late as possible.
-/// Uses alphabeta pruning to minmax more efficiently.
 /// </summary>
 /// <param name="game">: reference to the current game state</param>
 /// <returns></returns>
-int Player_Alphabeta::ChooseAction(const Game& game)
+int Player_Alphabeta_Mancala::ChooseAction(const GameClass& game)
 {
+
 	//choose an action to maximise minimum score
 
 	int bestAction = -1;
@@ -32,10 +21,9 @@ int Player_Alphabeta::ChooseAction(const Game& game)
 	game.GetValidActions(validActions);
 	for (int action : validActions)
 	{
-		auto nextState = game.Clone();
-		nextState->Do(action);
-
-		int score = MinmaxState(*nextState, depthLimit, a, b);
+		auto nextState = GameClass(game);
+		nextState.Do(action);
+		int score = MinmaxState(nextState, depthLimit, a, b);
 
 		if (score > a)
 		{
@@ -53,73 +41,94 @@ int Player_Alphabeta::ChooseAction(const Game& game)
 
 
 	}
-	
+
 	return bestAction;
 }
 
 
-// assign greater scores for more favorable outcomes
-// win as early as possible or tie or lose as late as possible
-int Player_Alphabeta::ScoreTerminalState(const Game& game) const
-{
-	auto outcome = game.GetPlayState();
-	int turnNumber = game.GetTurnNumber();
-	assert(outcome != Game::Unfinished);
-	assert(turnNumber < 1000 && (turnNumber > 4));
+//// assign greater scores for more favorable outcomes
+//// win as early as possible or tie or lose as late as possible
+//int Player_Alphabeta_Mancala::ScoreTerminalState(const GameClass& game) const
+//{
+//	auto outcome = game.GetPlayState();
+//	int turnNumber = game.GetTurnNumber();
+//	assert(outcome != Game::Unfinished);
+//	assert(turnNumber < 1000 && (turnNumber > 4));
+//
+//	// tie scores 0
+//	if (outcome == Game::Tie) return 0;
+//
+//	// win scores positively with greater scores for earlier wins
+//	if (outcome == GetPlayerId()) return 1000 - turnNumber;
+//
+//	// loss scores negatively with greater scores (less negative) for later losses
+//	return turnNumber - 1000;
+//}
+//
+//
+//int Player_Alphabeta_Mancala::ScoreLowerBound(const GameClass& game) const
+//{
+//	// score of losing next turn
+//	return (game.GetTurnNumber() + 1) - 1000;
+//}
+//
+//
+//int Player_Alphabeta_Mancala::ScoreUpperBound(const GameClass& game) const
+//{
+//	// score of winning 2 turns later
+//	return 1000 - (game.GetTurnNumber() + 2);
+//}
+//
+//
+////score a possibly non-terminal state
+//int Player_Alphabeta_Mancala::ScoreState(GameClass& game) const
+//{
+//	//PlayoutState(game);
+//	if (game.GetPlayState() == Game::Unfinished) { return 0; }
+//	return ScoreTerminalState(game);
+//}
 
-	// tie scores 0
-	if (outcome == Game::Tie) return 0;
-
-	// win scores positively with greater scores for earlier wins
-	if (outcome == GetPlayerId()) return 1000 - turnNumber;
-
-	// loss scores negatively with greater scores (less negative) for later losses
-	return turnNumber - 1000;
-}
 
 
-int Player_Alphabeta::ScoreLowerBound(const Game& game) const
-{
-	// score of losing next turn
-	return (game.GetTurnNumber() + 1) - 1000;
-}
-
-
-int Player_Alphabeta::ScoreUpperBound(const Game& game) const
-{
-	// score of winning 2 turns later
-	return 1000 - (game.GetTurnNumber() + 2);
-}
-
+//score a state based on how many beads in your mancala - how many in your opponents mancala
+//(does not care about winning early/losing late)
 
 //score a possibly non-terminal state
-int Player_Alphabeta::ScoreState(Game& game) const
+int Player_Alphabeta_Mancala::ScoreState(GameClass& game) const
 {
-	//PlayoutState(game);
-	if (game.GetPlayState() == Game::Unfinished) { return 0; }
-	return ScoreTerminalState(game);
-}
-
-
-//use playout policy to reach a terminal state
-void Player_Alphabeta::PlayoutState(Game& game) const
-{
-	while (game.GetPlayState() == Game::Unfinished)
+	if (GetPlayerId() == game.GetActivePlayer())
 	{
-		game.Do(PlayoutPolicy(game));
+		return game.ActivePlayerAdvantage();
+	}
+	else
+	{
+		return -game.ActivePlayerAdvantage();
 	}
 }
 
 
-//how to choose a move when playing to a terminal state to get a score
-int Player_Alphabeta::PlayoutPolicy(const Game& game) const
+int Player_Alphabeta_Mancala::ScoreTerminalState(const GameClass& game) const
 {
-	std::vector<int> validActions;
-	game.GetValidActions(validActions);
-
-	//pick random move
-	return validActions[rand() % validActions.size()];
+	assert(false);
+	return 0;
 }
+
+
+int Player_Alphabeta_Mancala::ScoreLowerBound(const GameClass& game) const
+{
+	int wonBeads = GetPlayerId() == game.GetActivePlayer() ? game.ActivePlayerScore() : game.OpponentScore();
+	int otherBeads = 48 - wonBeads;
+	return wonBeads - otherBeads;
+}
+
+
+int Player_Alphabeta_Mancala::ScoreUpperBound(const GameClass& game) const
+{
+	int lostBeads = GetPlayerId() == game.GetActivePlayer() ? game.OpponentScore() : game.ActivePlayerScore();
+	int otherBeads = 48 - lostBeads;
+	return otherBeads - lostBeads;
+}
+
 
 
 
@@ -135,7 +144,7 @@ int Player_Alphabeta::PlayoutPolicy(const Game& game) const
 /// <param name="a">: The lower bound on relevant scores</param>
 /// <param name="b">: The upper bound on relevant scores</param>
 /// <returns></returns>
-int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
+int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int b)
 {
 	if ((depth == 0) || (game.GetPlayState() != Game::Unfinished)) { return ScoreState(game); }
 
@@ -150,15 +159,15 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 		{
 			return bestScore;
 		}
-		
+
 		//std::vector<int> validActions;
 		//game.GetValidActions(validActions);
-		
+
 		for (int action : game.GetValidActions())
 		{
-			auto nextState = game.Clone();
-			nextState->Do(action);
-			int score = MinmaxState(*nextState, depth - 1, a, b);
+			auto nextState = GameClass(game);
+			nextState.Do(action);
+			int score = MinmaxState(nextState, depth - 1, a, b);
 
 			/*game.Do(action);
 			int score = MinmaxState(game, depth - 1, a, b);
@@ -189,7 +198,7 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 			}
 
 
-			
+
 		}
 		// best score might be less than a 'a' (i.e. if all possible scores were less than 'a')
 		return bestScore;
@@ -214,9 +223,9 @@ int Player_Alphabeta::MinmaxState(Game& game, int depth, int a, int b)
 
 		for (int action : game.GetValidActions())
 		{
-			auto nextState = game.Clone();
-			nextState->Do(action);
-			int score = MinmaxState(*nextState, depth - 1, a, b);
+			auto nextState = GameClass(game);
+			nextState.Do(action);
+			int score = MinmaxState(nextState, depth - 1, a, b);
 
 			/*game.Do(action);
 			int score = MinmaxState(game, depth - 1, a, b);

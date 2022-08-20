@@ -22,6 +22,8 @@ Game::PlayState Contest::PlayGame(Game& game, Player& p1, Player& p2)
     return game.GetPlayState();
 }
 
+
+
 void Contest::PlayNGames(Game& game, Player& p1, Player& p2, int n, std::map<Game::PlayState, int>& OutCounts)
 {
     for (int i = 0; i < n; i++)

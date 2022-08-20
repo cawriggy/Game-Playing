@@ -17,6 +17,13 @@ public:
 	int GetTurnNumber() const;
 	void GetValidActions(std::vector<int>& OutValidActions) const;
 
+	std::vector<int> GetValidActions() const
+	{
+		std::vector<int> validActions;
+		GetValidActions(validActions);
+		return validActions;
+	}
+
 	void Do(int action) override;
 	void Undo(int action) override;
 	PlayState GetPlayState() const;
@@ -47,6 +54,11 @@ public:
 	//     0  1  2  3  4  5     6   - active player scores in 6 and chooses from cups 0 - 5
 	
 
+	int ActivePlayerAdvantage() const { return  ActivePlayerScore() - OpponentScore(); }
+
+	int ActivePlayerScore() const { return BoardState[PlayerMancalaCupIx]; }
+	int OpponentScore() const { return BoardState[OpponentMancalaCupIx]; }
+
 private:
 	std::array<int,14>  BoardState = { 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0 };
 	std::set<int> Player1Cups= { 0,1,2,3,4,5 };
@@ -57,8 +69,6 @@ private:
 	int OpponentMancalaCupIx = 13;
 	std::array<int, 1000> ActionSequence = { 0 }; // assumes < 1000 actions til game ends
 
-	int ActivePlayerScore() const { return BoardState[PlayerMancalaCupIx]; }
-	int OpponentScore() const { return BoardState[OpponentMancalaCupIx]; }
 	
 
 };

@@ -301,5 +301,48 @@ namespace UnitTestGamePlaying
 
 	};
 
+
+
+	TEST_CLASS(Test_ScoreModule)
+	{
+
+
+
+		struct test_score_module
+		{
+			int getScore(int x) { return -x * x; }
+		};
+
+
+		struct search_poloicy
+		{
+			//auto score = []() {return 30; };
+			test_score_module *sm = nullptr;
+			int getScore() 
+			{ 
+				if (sm) { return sm->getScore(4); } 
+				return 0;
+			}
+			int sssss(auto g) {};
+		};
+
+
+		TEST_METHOD(test1)
+		{
+			auto score = []() {return 30; };
+
+			auto tsm = test_score_module();
+			auto sp = search_poloicy();
+			sp.sm = &tsm;
+
+			int z = sp.getScore();
+			Logger::WriteMessage(std::to_string(z).c_str());
+
+
+		}
+
+
+	};
+
 }
 

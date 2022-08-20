@@ -25,8 +25,47 @@
 #include "Player_MinmaxWMem.h"
 #include "Player_Alphabeta.h"
 #include "Player_BestNodeSearch.h"
+#include "Player_Alphabeta_Mancala.h"
 
 #define assertm(exp, msg) assert(((void)msg, exp))
+
+
+
+Game::PlayState PlayAGame(auto& game, auto& p1, auto& p2)
+{
+    //assert(&p1 != &p2); //the players may need to be distinct (to get the correct player number)
+    game.Reset();
+    p1.SetPlayerId(1);
+    p2.SetPlayerId(2);
+
+    while (game.GetPlayState() == Game::PlayState::Unfinished)
+    {
+        int Action = (game.GetActivePlayer() == 1) ? p1.ChooseAction(game) : p2.ChooseAction(game);
+        game.Do(Action);
+    }
+    return game.GetPlayState();
+}
+
+void PlayNAGames(auto& game, auto& p1, auto& p2, int n, std::map<Game::PlayState, int>& OutCounts)
+{
+    for (int i = 0; i < n; i++)
+    {
+        Game::PlayState Outcome = PlayAGame(game, p1, p2);
+        assert(Outcome == Game::Tie || Outcome == Game::Player1Wins || Outcome == Game::Player2Wins);
+        OutCounts[Outcome]++;
+    }
+
+    //print results
+#define NAME(o) '\'' << o.GetName() << '\''
+    std::cout << NAME(p1) << "  VS  " << NAME(p2) << '\n';
+    std::cout << n << " games of " << NAME(game) << '\n';
+    std::cout << OutCounts[Game::Tie] << " Ties\n";
+    std::cout << OutCounts[Game::Player1Wins] << " wins for player 1\n";
+    std::cout << OutCounts[Game::Player2Wins] << " wins for player 2\n" << std::endl;
+#undef NAME
+}
+
+
 
 int main()
 {
@@ -54,6 +93,13 @@ int main()
     auto pBestNode = Player_BestNodeSearch();
     pBestNode.SetDepthLimit(depth);
 
+    auto abManc = Player_Alphabeta_Mancala();
+    abManc.SetDepthLimit(depth);
+
+    auto abManc2 = Player_Alphabeta_Mancala();
+    abManc2.SetDepthLimit(1);
+
+
     //auto p = &pBestNode;
     auto p = &pAlphabeta;
     //auto p = &pMinmax;
@@ -65,14 +111,33 @@ int main()
 
     //time the process
     typedef std::chrono::steady_clock Clock;
+    //for (int i = 0; i < 5; i++)
+    //{
+    //    auto last = Clock::now();
+
+    //    //play some games
+    //    counts.clear();
+    //    c.PlayNGames(game, pRandom, *p, n, counts);
+    //    //c.PlayNGames(game, pRandom, pRandom, n, counts);
+
+    //    auto time = Clock::now();
+    //    auto diff = std::chrono::duration<double, std::milli >(time - last).count();
+    //    std::cout << diff << " ms\n";
+    //}
+
+
     for (int i = 0; i < 5; i++)
     {
         auto last = Clock::now();
 
         //play some games
         counts.clear();
- //       c.PlayNGames(game, pRandom, *p, n, counts);
-        c.PlayNGames(game, pRandom, pRandom, n, counts);
+        //PlayNAGames(game, abManc2, abManc, n, counts);
+        //PlayNAGames(game, pRandom, abManc, n, counts);
+        //PlayNAGames(game, abManc, abManc, n, counts);
+        PlayNAGames(game, abManc, pRandom, n, counts);
+
+        //c.PlayNGames(game, pRandom, pRandom, n, counts);
 
         auto time = Clock::now();
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();
