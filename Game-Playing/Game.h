@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <iostream>
 
 class Game
 {
@@ -21,7 +22,6 @@ public:
 	virtual PlayState GetPlayState() const = 0;
 
 	virtual void GetValidActions(std::vector<int>& OutValidActions) const = 0;
-	//virtual std::vector<int> GetValidActions() const = 0;
 	std::vector<int> GetValidActions() const 
 	{
 		std::vector<int> validActions;
@@ -36,4 +36,10 @@ public:
 	virtual ~Game() = default;
 	virtual std::unique_ptr<Game> Clone() const = 0;
 	virtual std::vector<int> GetStateVector() const = 0;
+
+	virtual std::string GetDisplayString() const { return "get display string not implemented"; }
+	void Display() const
+	{
+		std::cout << GetDisplayString();
+	}
 };

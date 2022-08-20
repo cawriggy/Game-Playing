@@ -136,6 +136,7 @@
     <ClCompile Include="Contest.cpp" />
     <ClCompile Include="Game-Playing.cpp" />
     <ClCompile Include="Game_Connect4.cpp" />
+    <ClCompile Include="Game_Connect4_Bitboards.cpp" />
     <ClCompile Include="Game_Mancala.cpp" />
     <ClCompile Include="Noughts_and_Crosses.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="Player_Alphabeta_Mancala.cpp" />
     <ClCompile Include="Player_BestNodeSearch.cpp" />
     <ClCompile Include="Player_FirstValidAction.cpp" />
+    <ClCompile Include="Player_Human.cpp" />
     <ClCompile Include="Player_Minimax.cpp" />
     <ClCompile Include="Player_MinmaxWMem.cpp" />
     <ClCompile Include="Player_Random.cpp" />
@@ -151,6 +153,7 @@
     <ClInclude Include="Contest.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Game_Connect4.h" />
+    <ClInclude Include="Game_Connect4_Bitboards.h" />
     <ClInclude Include="Game_Mancala.h" />
     <ClInclude Include="Noughts_and_Crosses.h" />
     <ClInclude Include="Player.h" />
@@ -158,6 +161,7 @@
     <ClInclude Include="Player_Alphabeta_Mancala.h" />
     <ClInclude Include="Player_BestNodeSearch.h" />
     <ClInclude Include="Player_FirstValidAction.h" />
+    <ClInclude Include="Player_Human.h" />
     <ClInclude Include="Player_Minimax.h" />
     <ClInclude Include="Player_MinmaxWMem.h" />
     <ClInclude Include="Player_Random.h" />
