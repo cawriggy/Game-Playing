@@ -31,7 +31,7 @@ std::string Game_Mancala::GetDisplayString() const
     
     auto stateString = [this](int i) { int n = BoardState[i]; return std::to_string(n) + ((n < 10) ? " " : ""); };
 
-    std::string player = std::to_string(GetActivePlayer());
+    std::string player = std::to_string(ActivePlayer);
 
     std::string player1_mancala = stateString(6);
     std::string player2_mancala = stateString(13);
@@ -77,7 +77,7 @@ bool Game_Mancala::IsValidAction(int Action) const
     {
         return false;
     }
-    int cupIx = (GetActivePlayer() == 1) ? i : i + 7;
+    int cupIx = (ActivePlayer == 1) ? i : i + 7;
     return (BoardState[cupIx] != 0);
 }
 
@@ -88,16 +88,19 @@ void Game_Mancala::Do(int Action)
     assert(IsValidAction(Action));
     assert(TurnNumber < 1000 && TurnNumber >= 0);
 
-    int cupIx = (GetActivePlayer() == 1) ? action : action + 7;
+    int cupIx = (ActivePlayer == 1) ? action : action + 7;
 
     //pick up beads from the chosen cup
     int held = BoardState[cupIx]; 
     BoardState[cupIx] = 0;
+
+
     // distribute beads
     while (held > 0)
     {
         // advance by 1 looping round the board
         cupIx = (cupIx + 1) % 14;
+        
         // drop a bead
         if (cupIx != OpponentMancalaCupIx)
         {
@@ -105,11 +108,12 @@ void Game_Mancala::Do(int Action)
             BoardState[cupIx] += 1;
         }
     }
+
     // capture if last bead dropped in an empty cup on players side
     assert(0 <= cupIx && cupIx <= (14 - 1));
     if (BoardState[cupIx] == 1)
     {
-        if ( (GetActivePlayer() == 1 && Player1Cups.contains(cupIx)) || (GetActivePlayer() == 2 && Player2Cups.contains(cupIx)) )
+        if ( (ActivePlayer == 1 && Player1Cups.contains(cupIx)) || (ActivePlayer == 2 && Player2Cups.contains(cupIx)) )
         {
             int opposite_cupIx = 12 - cupIx;
             BoardState[PlayerMancalaCupIx] += BoardState[opposite_cupIx];
@@ -181,7 +185,7 @@ Game::PlayState Game_Mancala::GetPlayState() const
         int active_player_score = ActivePlayerScore();
         int opponent_score = OpponentScore();
         // sweep remaining into opponents mancala
-        if (GetActivePlayer() == 1)
+        if (ActivePlayer == 1)
         {
             for (int i = 7; i < 13; i++)
             {
@@ -201,11 +205,11 @@ Game::PlayState Game_Mancala::GetPlayState() const
         {
             if (active_player_score > opponent_score)
             {
-                return GetActivePlayer() == 1 ? Player1Wins : Player2Wins;
+                return ActivePlayer == 1 ? Player1Wins : Player2Wins;
             }
             else
             {
-                return GetActivePlayer() == 1 ? Player2Wins : Player1Wins;
+                return ActivePlayer == 1 ? Player2Wins : Player1Wins;
             }
         }
         return Tie;
@@ -231,7 +235,7 @@ void Game_Mancala::Reset()
 std::vector<int> Game_Mancala::GetStateVector() const
 {
     std::vector<int> stateVec(BoardState.begin(), BoardState.end() );
-    stateVec.push_back(GetActivePlayer());
+    stateVec.push_back(ActivePlayer);
     return stateVec;
 }
 

@@ -4,8 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cassert>
-#include <cstdlib>
+#include <assert.h>
 #include <time.h>
 #include <map>
 #include <stdio.h>
@@ -18,6 +17,8 @@
 #include "Noughts_and_Crosses.h"
 #include "Game_Connect4.h"
 #include "Game_Connect4_Bitboards.h"
+#include "Game_Mancala.h"
+#include "Game_Mancala_Optimised.h"
 
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
@@ -27,9 +28,6 @@
 #include "Player_BestNodeSearch.h"
 #include "Player_Alphabeta_Mancala.h"
 #include "Player_Human.h"
-
-//#define assertm(exp, msg) assert(((void)msg, exp))
-
 
 
 Game::PlayState PlayAGame(auto& game, auto& p1, auto& p2)
@@ -47,7 +45,7 @@ Game::PlayState PlayAGame(auto& game, auto& p1, auto& p2)
     return game.GetPlayState();
 }
 
-void PlayNAGames(auto& game, auto& p1, auto& p2, int n, std::map<Game::PlayState, int>& OutCounts)
+void PlayNGames(auto& game, auto& p1, auto& p2, int n, std::map<Game::PlayState, int>& OutCounts)
 {
     for (int i = 0; i < n; i++)
     {
@@ -72,13 +70,13 @@ int main()
 {
 
     ////play against alphabeta
-    //auto game = Game_Connect4_Bitboards();
-    ////auto game = Noughts_and_Crosses();
-    //auto p1 = Player_Alphabeta();
-    //p1.SetDepthLimit(8);
-    //auto p2 = Player_Human();
-    //auto c = Contest();
-    //auto r = c.PlayGame(game, p1, p2);
+    ////auto game = Game_Connect4_Bitboards();
+    ////auto game = Game_Mancala();
+    //auto game = Game_Mancala_Optimised();
+    //auto p2 = Player_Alphabeta_Mancala();
+    //p2.SetDepthLimit(14);
+    //auto p1 = Player_Human();
+    //auto r = PlayAGame(game, p1, p2);
 
     ////display result
     //game.Display();
@@ -98,11 +96,12 @@ int main()
 
 
     
-    auto game = Game_Mancala();
+    //auto game = Game_Mancala();
+    auto game = Game_Mancala_Optimised();
 
 
     auto pRandom = Player_Random();
-    int depth = 3;
+    int depth = 5;
 
     auto abManc = Player_Alphabeta_Mancala();
     abManc.SetDepthLimit(depth);
@@ -111,25 +110,11 @@ int main()
     abManc2.SetDepthLimit(1);
 
 
-    int n = 100;
+    int n = 10;
     std::map<Game::PlayState, int> counts;
 
     //time the process
     typedef std::chrono::steady_clock Clock;
-    //for (int i = 0; i < 5; i++)
-    //{
-    //    auto last = Clock::now();
-
-    //    //play some games
-    //    counts.clear();
-    //    c.PlayNGames(game, pRandom, *p, n, counts);
-    //    //c.PlayNGames(game, pRandom, pRandom, n, counts);
-
-    //    auto time = Clock::now();
-    //    auto diff = std::chrono::duration<double, std::milli >(time - last).count();
-    //    std::cout << diff << " ms\n";
-    //}
-
 
     for (int i = 0; i < 5; i++)
     {
@@ -137,11 +122,8 @@ int main()
 
         //play some games
         counts.clear();
-        //PlayNAGames(game, abManc2, abManc, n, counts);
-        PlayNAGames(game, pRandom, abManc, n, counts);
-        //PlayNAGames(game, abManc, abManc, n, counts);
-        //PlayNAGames(game, abManc, pRandom, n, counts);
-
+        PlayNGames(game, pRandom, abManc, n, counts);
+        //PlayNGames(game, pRandom, pRandom, n, counts);
 
         auto time = Clock::now();
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();

@@ -2,6 +2,16 @@
 #include "Game_Mancala.h"
 #include <assert.h>
 
+
+
+// an alphabeta-based player for mancala
+
+//optimisations:
+//looping over all actions and skipping the invalid ones is faster than getting a vector of valid actions (was approx 30% faster)
+//
+
+
+
 /// <summary>
 /// Choose an action to win as early as possible or lose as late as possible.
 /// </summary>
@@ -163,8 +173,12 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 		//std::vector<int> validActions;
 		//game.GetValidActions(validActions);
 
-		for (int action : game.GetValidActions())
+		//for (int action : game.GetValidActions())
+		//{
+		for (int action : game.AllActions)
 		{
+			if (!game.IsValidAction(action)) { continue; }
+
 			auto nextState = GameClass(game);
 			nextState.Do(action);
 			int score = MinmaxState(nextState, depth - 1, a, b);
@@ -221,8 +235,12 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 		//std::vector<int> validActions;
 		//game.GetValidActions(validActions);
 
-		for (int action : game.GetValidActions())
+		//for (int action : game.GetValidActions())
+		//{
+		for (int action : game.AllActions)
 		{
+			if (!game.IsValidAction(action)) { continue; }
+
 			auto nextState = GameClass(game);
 			nextState.Do(action);
 			int score = MinmaxState(nextState, depth - 1, a, b);

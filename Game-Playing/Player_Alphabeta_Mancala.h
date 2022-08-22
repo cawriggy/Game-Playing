@@ -1,10 +1,13 @@
 #pragma once
 #include "Player.h"
 #include "Game_Mancala.h"
+#include "Game_Mancala_Optimised.h"
+
 class Player_Alphabeta_Mancala //:public Player
 {
 public:
-    using GameClass = Game_Mancala;
+    //using GameClass = Game_Mancala;
+    using GameClass = Game_Mancala_Optimised;
     std::string GetName() { return "Alphabeta for Mancala depth:" + std::to_string(GetDepthLimit()); }
     int ChooseAction(const GameClass& game);
 
