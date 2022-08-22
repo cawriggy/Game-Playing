@@ -132,6 +132,26 @@ void Game_Mancala_Optimised::Do(int Action)
 
     }
 
+
+
+    //an available action means the game is unfinished
+    for (auto action : AllActions)
+    {
+        if (BoardState[action] != 0)
+        {
+            return;
+        }
+    }
+
+    // no actions available for the active player
+    // opponents gets all remaining points
+    int active_player_score = BoardState[6];
+    int opponent_score = 48 - active_player_score;
+    BoardState.fill(0);
+    BoardState[6] = active_player_score;
+    BoardState[13] = opponent_score;
+
+
 }
 
 void Game_Mancala_Optimised::Undo(int Action) //TODO

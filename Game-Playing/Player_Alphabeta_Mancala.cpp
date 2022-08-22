@@ -27,10 +27,14 @@ int Player_Alphabeta_Mancala::ChooseAction(const GameClass& game)
 	int a = static_cast<int>(-1e9);
 	int b = static_cast<int>(1e9);
 
-	std::vector<int> validActions;
-	game.GetValidActions(validActions);
-	for (int action : validActions)
+	//std::vector<int> validActions;
+	//game.GetValidActions(validActions);
+	//for (int action : validActions)
+	//{
+	for (int action : game.AllActions)
 	{
+		if (!game.IsValidAction(action)) { continue; }
+
 		auto nextState = GameClass(game);
 		nextState.Do(action);
 		int score = MinmaxState(nextState, depthLimit, a, b);
