@@ -18,7 +18,6 @@
 #include "Game_Connect4.h"
 #include "Game_Connect4_Bitboards.h"
 #include "Game_Mancala.h"
-#include "Game_Mancala_Optimised.h"
 
 #include "Player_FirstValidAction.h"
 #include "Player_Random.h"
@@ -127,9 +126,7 @@ int main()
     srand((unsigned int)time(0));
 
 
-    
-    //auto game = Game_Mancala();
-    auto game = Game_Mancala_Optimised();
+    auto game = Game_Mancala();
 
 
     auto pRandom = Player_Random();
@@ -144,7 +141,7 @@ int main()
     //PlayAGame(game, abManc1, abManc2);
     //game.DisplayActionSequence();
 
-    int n = 100;
+    int n = 1000;
     std::map<Game::PlayState, int> counts;
 
     //time the process
@@ -156,11 +153,8 @@ int main()
 
         //play some games
         counts.clear();
-        maxTurnsInNGames(game, pRandom, pRandom, n, counts);
-        maxTurnsInNGames(game, pRandom, abManc1, n, counts);
         //PlayNGames(game, pRandom, abManc1, n, counts);
-        //PlayNGames(game, abManc1, abManc2, n, counts);
-        //PlayNGames(game, pRandom, pRandom, n, counts);
+        PlayNGames(game, pRandom, pRandom, n, counts);
 
         auto time = Clock::now();
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();

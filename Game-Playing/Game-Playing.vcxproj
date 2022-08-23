@@ -138,7 +138,6 @@
     <ClCompile Include="Game_Connect4.cpp" />
     <ClCompile Include="Game_Connect4_Bitboards.cpp" />
     <ClCompile Include="Game_Mancala.cpp" />
-    <ClCompile Include="Game_Mancala_Optimised.cpp" />
     <ClCompile Include="Noughts_and_Crosses.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player_Alphabeta.cpp" />
@@ -156,7 +155,6 @@
     <ClInclude Include="Game_Connect4.h" />
     <ClInclude Include="Game_Connect4_Bitboards.h" />
     <ClInclude Include="Game_Mancala.h" />
-    <ClInclude Include="Game_Mancala_Optimised.h" />
     <ClInclude Include="Noughts_and_Crosses.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Player_Alphabeta.h" />

@@ -1,12 +1,11 @@
 #pragma once
 #include "Player.h"
-//#include "Game_Mancala.h"
-#include "Game_Mancala_Optimised.h"
+#include "Game_Mancala.h"
 
 class Player_Alphabeta_Mancala
 {
 public:
-    using GameClass = Game_Mancala_Optimised;
+    using GameClass = Game_Mancala;
     
     int ChooseAction(const GameClass& game);
     

@@ -99,8 +99,9 @@ namespace UnitTestGamePlaying
 			int action = 3;
 			auto game = GameClass();
 			game.Do(action);
-			std::vector<int> expectedNewState = { 4, 4, 4, 0, 5, 5, 1, 5, 4, 4, 4, 4, 4, 0,2 };
+			std::vector<int> expectedNewState = { 5, 4, 4, 4, 4, 4, 0, 4, 4, 4, 0, 5, 5, 1,2 };
 			std::vector<int> newState = game.GetStateVector();
+			Logger::WriteMessage(game.GetDisplayString().c_str());
 			Assert::IsTrue(newState == expectedNewState);
 		}
 
