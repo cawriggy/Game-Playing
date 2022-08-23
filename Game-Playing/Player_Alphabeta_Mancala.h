@@ -1,15 +1,26 @@
 #pragma once
 #include "Player.h"
-#include "Game_Mancala.h"
+//#include "Game_Mancala.h"
 #include "Game_Mancala_Optimised.h"
 
-class Player_Alphabeta_Mancala //:public Player
+class Player_Alphabeta_Mancala
 {
 public:
-    //using GameClass = Game_Mancala;
     using GameClass = Game_Mancala_Optimised;
-    std::string GetName() { return "Alphabeta for Mancala depth:" + std::to_string(GetDepthLimit()); }
+    
     int ChooseAction(const GameClass& game);
+    
+    // depthLimit 0 means only consider the immediate action
+    // depth n considers upto n actions after that
+    int GetDepthLimit() 
+    { 
+        return depthLimit;
+    }
+
+    void SetDepthLimit(int limit) 
+    { 
+        depthLimit = limit; 
+    }
 
     int GetPlayerId() const
     {
@@ -21,21 +32,20 @@ public:
         PlayerId = newId;
     }
 
-    // depthLimit 0 means only consider the immediate action
-    // depth n considers upto n actions after that
-    int GetDepthLimit() { return depthLimit; }
-    void SetDepthLimit(int limit) { depthLimit = limit; }
+    std::string GetName() 
+    {
+        return "Alphabeta for Mancala depth:" + std::to_string(GetDepthLimit()); 
+    }
 
 private:
     int depthLimit = 2;
+    int PlayerId = -1;
 
-    int ScoreTerminalState(const GameClass& game) const;
     int ScoreLowerBound(const GameClass& game) const;
     int ScoreUpperBound(const GameClass& game) const;
     int ScoreState(GameClass& game) const;
 
     int MinmaxState(GameClass& game, int depth, int a, int b);
-    // int NegamaxState(Game& Game, int depth, int a, int b);
-    int PlayerId = -1;
+
 };
 

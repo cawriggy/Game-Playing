@@ -31,19 +31,23 @@ public:
 	}
 
 	void Do(int action) override;
-	void Undo(int action) override;//not implemented
+
+	[[deprecated("make copies instead")]]
+	void Undo(int action) override;
+
 	PlayState GetPlayState() const;
 	void Reset();
 	std::unique_ptr<Game> Clone() const { return std::make_unique<Game_Mancala_Optimised>(*this); }
 	std::vector<int> GetStateVector() const;
 
+	const std::array<int, 6> AllActions = { 5,4,3,2,1,0 };
+	
 	// visualisation
+	void SetPerspective(int player) { persepective = player; }
 	void Display() const;
 	void DisplayActionSequence() const;
 	std::string GetDisplayString() const;
 	std::string GetDisplayActionSequenceString() const;
-
-	const std::array<int, 6> AllActions = { 0,1,2,3,4,5 };
 
 	// validation
 	bool IsValidAction(int Action) const;
@@ -68,15 +72,16 @@ public:
 	// the board is stored from the perspective of the active player (6 active player's cups, 1 active player's mancala, 6 opponent's cups, 1 opponent's mancala)
 
 
-
 private:
 	std::array<int, 14>  BoardState = { 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0 };
 	int TurnNumber = 0;
 	int ActivePlayer = 1;
 	const int PlayerMancalaCupIx = 6;  // active players mancala
 	const int OpponentMancalaCupIx = 13;
+	int persepective = 1;
 	
-	std::array<int, 1000> ActionSequence = { 0 }; // assumes < 1000 actions til game ends
+	std::array<int, 200> ActionSequence = { 0 };
+	// note: in 1 million random games at most 107 actions were used
 
 
 

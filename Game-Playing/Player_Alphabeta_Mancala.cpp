@@ -3,7 +3,6 @@
 #include <assert.h>
 
 
-
 // an alphabeta-based player for mancala
 
 //optimisations:
@@ -11,26 +10,18 @@
 //
 
 
-
 /// <summary>
-/// Choose an action to win as early as possible or lose as late as possible.
+/// Choose an action to maximise minimum score.
 /// </summary>
 /// <param name="game">: reference to the current game state</param>
 /// <returns></returns>
 int Player_Alphabeta_Mancala::ChooseAction(const GameClass& game)
 {
-
-	//choose an action to maximise minimum score
-
 	int bestAction = -1;
 	int bestScore = static_cast<int>(-1e9);
 	int a = static_cast<int>(-1e9);
 	int b = static_cast<int>(1e9);
 
-	//std::vector<int> validActions;
-	//game.GetValidActions(validActions);
-	//for (int action : validActions)
-	//{
 	for (int action : game.AllActions)
 	{
 		if (!game.IsValidAction(action)) { continue; }
@@ -47,6 +38,7 @@ int Player_Alphabeta_Mancala::ChooseAction(const GameClass& game)
 			a = score;
 		}
 
+		//keep track of the best action
 		if (score > bestScore)
 		{
 			bestScore = score;
@@ -58,49 +50,6 @@ int Player_Alphabeta_Mancala::ChooseAction(const GameClass& game)
 
 	return bestAction;
 }
-
-
-//// assign greater scores for more favorable outcomes
-//// win as early as possible or tie or lose as late as possible
-//int Player_Alphabeta_Mancala::ScoreTerminalState(const GameClass& game) const
-//{
-//	auto outcome = game.GetPlayState();
-//	int turnNumber = game.GetTurnNumber();
-//	assert(outcome != Game::Unfinished);
-//	assert(turnNumber < 1000 && (turnNumber > 4));
-//
-//	// tie scores 0
-//	if (outcome == Game::Tie) return 0;
-//
-//	// win scores positively with greater scores for earlier wins
-//	if (outcome == GetPlayerId()) return 1000 - turnNumber;
-//
-//	// loss scores negatively with greater scores (less negative) for later losses
-//	return turnNumber - 1000;
-//}
-//
-//
-//int Player_Alphabeta_Mancala::ScoreLowerBound(const GameClass& game) const
-//{
-//	// score of losing next turn
-//	return (game.GetTurnNumber() + 1) - 1000;
-//}
-//
-//
-//int Player_Alphabeta_Mancala::ScoreUpperBound(const GameClass& game) const
-//{
-//	// score of winning 2 turns later
-//	return 1000 - (game.GetTurnNumber() + 2);
-//}
-//
-//
-////score a possibly non-terminal state
-//int Player_Alphabeta_Mancala::ScoreState(GameClass& game) const
-//{
-//	//PlayoutState(game);
-//	if (game.GetPlayState() == Game::Unfinished) { return 0; }
-//	return ScoreTerminalState(game);
-//}
 
 
 
@@ -118,13 +67,6 @@ int Player_Alphabeta_Mancala::ScoreState(GameClass& game) const
 	{
 		return -game.ActivePlayerAdvantage();
 	}
-}
-
-
-int Player_Alphabeta_Mancala::ScoreTerminalState(const GameClass& game) const
-{
-	assert(false);
-	return 0;
 }
 
 
@@ -174,11 +116,6 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 			return bestScore;
 		}
 
-		//std::vector<int> validActions;
-		//game.GetValidActions(validActions);
-
-		//for (int action : game.GetValidActions())
-		//{
 		for (int action : game.AllActions)
 		{
 			if (!game.IsValidAction(action)) { continue; }
@@ -236,11 +173,7 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 			return bestScore;
 		}
 
-		//std::vector<int> validActions;
-		//game.GetValidActions(validActions);
 
-		//for (int action : game.GetValidActions())
-		//{
 		for (int action : game.AllActions)
 		{
 			if (!game.IsValidAction(action)) { continue; }
@@ -281,7 +214,4 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 		// best score might be greater than 'b' (i.e. if all possible scores were greater than 'b')
 		return bestScore;
 	}
-
-	assert(false);
-	return 0;
 }

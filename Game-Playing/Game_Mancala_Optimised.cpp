@@ -8,7 +8,7 @@
 /*
     Mancala Rules
     - to play select a cup on your side
-    - distribute the stones, 1 each in cups to the right
+    - distribute the stones, 1 each in sequential cups
       going anti clockwise, including own mancala but not opponents mancala.
     - if end in your mancala get another turn
     - if end in empty cup on your side, capture opponents stones
@@ -18,9 +18,10 @@
 
 
 //
-// optimisations
-// deduce final score from the number in the mancala of the player who has no more beads (instead of summingthe remaining beads in a for loop)
-// rearrange the boardstate so it is always from the active players perspective (avoids several branches (and makes the code tidier)
+// optimisations:
+// - avoid allocating a vector when checking if the game is finnished
+// - deduce final score from the number in the mancala of the player who has no more stones (instead of summing the remaining stones in a for loop)
+// - rearrange the boardstate so it is always from the active players perspective (avoids several branches and makes the code tidier)
 // 
 
 
@@ -37,10 +38,19 @@ void Game_Mancala_Optimised::DisplayActionSequence() const
 
 std::string Game_Mancala_Optimised::GetDisplayString() const
 {
-    //display the board as text with Player 2 at top, Player 1 below
+    //display board from prespective of specified player
+    auto boardCopy = BoardState;
+    if (ActivePlayer != persepective)
+    { 
+        std::swap_ranges(boardCopy.begin(), boardCopy.begin() + 7, boardCopy.begin() + 7);
+    }
 
-    //pad numbers to width 2 (i.e. "2" becomes "2 ")
-    auto stateString = [this](int i) { int n = BoardState[i]; return std::to_string(n) + ((n < 10) ? " " : ""); };
+    //pad numbers to width 2 for consistent layout (i.e. "2" becomes "2 ")
+    auto stateString = [boardCopy](int i) 
+    {
+        int n = boardCopy[i]; 
+        return std::to_string(n) + ((n < 10) ? " " : ""); 
+    };
 
     std::string player = std::to_string(ActivePlayer);
 
@@ -57,10 +67,10 @@ std::string Game_Mancala_Optimised::GetDisplayString() const
         player1_cups += "  " + stateString(i);
     };
 
-
     std::string s = "\n---       Player " + player + " to play      ---\n" +
         " " + player2_mancala + " |" + player2_cups + " |\n" +
         "    |" + player1_cups + " |  " + player1_mancala + "\n\n";
+
     return s;
 }
 
@@ -85,19 +95,16 @@ std::string Game_Mancala_Optimised::GetDisplayActionSequenceString() const
 void Game_Mancala_Optimised::Do(int Action)
 {
     assert(IsValidAction(Action));
-    assert(TurnNumber < 1000 && TurnNumber >= 0);
-    
-    if (!IsValidAction(Action) || (unsigned) TurnNumber >= 1000) { return; } //invalid action, do not process it
-
-
+    assert(TurnNumber < ActionSequence.size() && TurnNumber >= 0);
+    if (!IsValidAction(Action)) { return; } //invalid action, do not process it
     unsigned cupIx = Action;
 
-    //pick up beads from the chosen cup
+    //pick up stones from the chosen cup
     int held = BoardState[cupIx];
     BoardState[cupIx] = 0;
 
 
-    // distribute beads
+    // distribute stones
     while (held > 0)
     {
         // advance by 1 looping back round the board skipping the opponent mancala
@@ -119,8 +126,11 @@ void Game_Mancala_Optimised::Do(int Action)
         BoardState[opposite_cupIx] = 0;
     }
 
-    ActionSequence[TurnNumber++] = Action;
-
+    if ((unsigned)TurnNumber < ActionSequence.size())
+    {
+        ActionSequence[TurnNumber] = Action;
+    }
+    TurnNumber++;
 
 
     if (cupIx != PlayerMancalaCupIx) // end of turn (did not end move in mancala)
@@ -133,7 +143,6 @@ void Game_Mancala_Optimised::Do(int Action)
     }
 
 
-
     //an available action means the game is unfinished
     for (auto action : AllActions)
     {
@@ -142,7 +151,6 @@ void Game_Mancala_Optimised::Do(int Action)
             return;
         }
     }
-
     // no actions available for the active player
     // opponents gets all remaining points
     int active_player_score = BoardState[6];
@@ -151,10 +159,10 @@ void Game_Mancala_Optimised::Do(int Action)
     BoardState[6] = active_player_score;
     BoardState[13] = opponent_score;
 
-
 }
 
-void Game_Mancala_Optimised::Undo(int Action) //TODO
+
+void Game_Mancala_Optimised::Undo(int Action)
 {
     bool CanUndo = false;
     assert(CanUndo);
@@ -172,17 +180,13 @@ std::string Game_Mancala_Optimised::GetName() const
     return "Mancala";
 }
 
-//int Game_Mancala_Optimised::GetActivePlayer() const
-//{
-//    assert(IsValidPlayer(ActivePlayer));
-//    return ActivePlayer;
-//}
 
 int Game_Mancala_Optimised::GetTurnNumber() const
 {
     assert(0 <= TurnNumber && TurnNumber <= 1000);
     return TurnNumber;
 }
+
 
 void Game_Mancala_Optimised::GetValidActions(std::vector<int>& OutActions) const
 {
@@ -196,14 +200,16 @@ void Game_Mancala_Optimised::GetValidActions(std::vector<int>& OutActions) const
     }
 }
 
+
 bool Game_Mancala_Optimised::IsValidAction(int Action) const
 {
     return (0 <= Action && Action <= 5) && (BoardState[Action] != 0);
 }
 
+
 Game::PlayState Game_Mancala_Optimised::GetPlayState() const
 {
-    //an available action means the game is unfinished
+    //an available action means the game is unfinished 
     for (auto action : AllActions) 
     {
         if (BoardState[action] != 0)
@@ -232,6 +238,7 @@ Game::PlayState Game_Mancala_Optimised::GetPlayState() const
     return Tie;
 
 }
+
 
 void Game_Mancala_Optimised::Reset()
 {

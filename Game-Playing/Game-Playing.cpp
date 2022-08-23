@@ -66,6 +66,34 @@ void PlayNGames(auto& game, auto& p1, auto& p2, int n, std::map<Game::PlayState,
 
 
 
+void maxTurnsInNGames(auto& game, auto& p1, auto& p2, int n, std::map<Game::PlayState, int>& OutCounts)
+{
+    int maxTurns = 0;
+    for (int i = 0; i < n; i++)
+    {
+        Game::PlayState Outcome = PlayAGame(game, p1, p2);
+        assert(Outcome == Game::Tie || Outcome == Game::Player1Wins || Outcome == Game::Player2Wins);
+        OutCounts[Outcome]++;
+
+        if (game.GetTurnNumber() > maxTurns)
+        {
+            maxTurns = game.GetTurnNumber();
+        }
+    }
+
+    //print results
+#define NAME(o) '\'' << o.GetName() << '\''
+    std::cout << NAME(p1) << "  VS  " << NAME(p2) << '\n';
+    std::cout << n << " games of " << NAME(game) << '\n';
+    std::cout << OutCounts[Game::Tie] << " Ties\n";
+    std::cout << OutCounts[Game::Player1Wins] << " wins for player 1\n";
+    std::cout << OutCounts[Game::Player2Wins] << " wins for player 2\n";
+    std::cout << maxTurns << " max turns\n" << std::endl;
+#undef NAME
+}
+
+
+
 int main()
 {
 
@@ -73,10 +101,14 @@ int main()
     ////auto game = Game_Connect4_Bitboards();
     ////auto game = Game_Mancala();
     //auto game = Game_Mancala_Optimised();
+    //
     //auto p2 = Player_Alphabeta_Mancala();
-    //p2.SetDepthLimit(14);
+    //p2.SetDepthLimit(16);
+
     //auto p1 = Player_Human();
-    //auto r = PlayAGame(game, p1, p2);
+    //game.SetPerspective(2);
+    //
+    //auto r = PlayAGame(game, p2, p1);
 
     ////display result
     //game.Display();
@@ -101,16 +133,18 @@ int main()
 
 
     auto pRandom = Player_Random();
-    int depth = 5;
+    //int depth = 5;
 
-    auto abManc = Player_Alphabeta_Mancala();
-    abManc.SetDepthLimit(depth);
+    auto abManc1 = Player_Alphabeta_Mancala();
+    abManc1.SetDepthLimit(8);
 
     auto abManc2 = Player_Alphabeta_Mancala();
-    abManc2.SetDepthLimit(1);
+    abManc2.SetDepthLimit(16);
 
+    //PlayAGame(game, abManc1, abManc2);
+    //game.DisplayActionSequence();
 
-    int n = 10;
+    int n = 100;
     std::map<Game::PlayState, int> counts;
 
     //time the process
@@ -122,7 +156,10 @@ int main()
 
         //play some games
         counts.clear();
-        PlayNGames(game, pRandom, abManc, n, counts);
+        maxTurnsInNGames(game, pRandom, pRandom, n, counts);
+        maxTurnsInNGames(game, pRandom, abManc1, n, counts);
+        //PlayNGames(game, pRandom, abManc1, n, counts);
+        //PlayNGames(game, abManc1, abManc2, n, counts);
         //PlayNGames(game, pRandom, pRandom, n, counts);
 
         auto time = Clock::now();

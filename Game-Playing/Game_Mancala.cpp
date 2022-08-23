@@ -130,6 +130,34 @@ void Game_Mancala::Do(int Action)
         OpponentMancalaCupIx = 6 + 13 - OpponentMancalaCupIx;
     }
 
+
+
+
+    int offset = (ActivePlayer == 1) ? 0 : 7;
+    for (auto action : AllActions)
+    {
+        if (BoardState[action + offset] != 0)
+        {
+            return;
+        }
+    }
+
+    // sweep remaining into opponents mancala
+    if (ActivePlayer == 1)
+    {
+        for (int i = 7; i < 13; i++)
+        {
+            BoardState[13] += BoardState[i];
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            BoardState[6] += BoardState[i];
+        }
+    }
+
 }
 
 void Game_Mancala::Undo(int Action) //TODO
@@ -177,45 +205,31 @@ void Game_Mancala::GetValidActions(std::vector<int>&OutActions) const
 
 Game::PlayState Game_Mancala::GetPlayState() const
 {
-    std::vector<int> validActions;
-    GetValidActions(validActions);
-    if (validActions.empty()) // Game over 
-    { 
-        assert(validActions.size() == 0);
-        int active_player_score = ActivePlayerScore();
-        int opponent_score = OpponentScore();
-        // sweep remaining into opponents mancala
-        if (ActivePlayer == 1)
+    int offset = (ActivePlayer == 1) ? 0 : 7;
+    for (auto action : AllActions)
+    {
+        if (BoardState[action + offset] != 0)
         {
-            for (int i = 7; i < 13; i++)
-            {
-                opponent_score += BoardState[i];
-            }
+            return Unfinished;
+        }
+    }
+
+    int active_player_score = ActivePlayerScore();
+    int opponent_score = OpponentScore();
+        
+    assert(opponent_score + active_player_score == 48);
+    if (active_player_score != opponent_score) // not a tie
+    {
+        if (active_player_score > opponent_score)
+        {
+            return ActivePlayer == 1 ? Player1Wins : Player2Wins;
         }
         else
         {
-            for (int i = 0; i < 6; i++)
-            {
-                opponent_score += BoardState[i];
-            }
+            return ActivePlayer == 1 ? Player2Wins : Player1Wins;
         }
-        
-        assert(opponent_score + active_player_score == 48);
-        if (active_player_score != opponent_score) // not a tie
-        {
-            if (active_player_score > opponent_score)
-            {
-                return ActivePlayer == 1 ? Player1Wins : Player2Wins;
-            }
-            else
-            {
-                return ActivePlayer == 1 ? Player2Wins : Player1Wins;
-            }
-        }
-        return Tie;
-        
     }
-    return Unfinished;
+    return Tie;
 }
 
 void Game_Mancala::Reset() 
