@@ -16,7 +16,6 @@
 
 #include "Noughts_and_Crosses.h"
 #include "Game_Connect4.h"
-#include "Game_Connect4_Bitboards.h"
 #include "Game_Mancala.h"
 
 #include "Player_FirstValidAction.h"
@@ -102,7 +101,7 @@ int main()
     doMoveOrdering();
 
     ////play against alphabeta
-    ////auto game = Game_Connect4_Bitboards();
+    ////auto game = Game_Connect4();
     ////auto game = Game_Mancala();
     //auto game = Game_Mancala_Optimised();
     //
