@@ -138,6 +138,7 @@
     <ClCompile Include="Game_Connect4.cpp" />
     <ClCompile Include="Game_Connect4_Bitboards.cpp" />
     <ClCompile Include="Game_Mancala.cpp" />
+    <ClCompile Include="MoveOrdering.cpp" />
     <ClCompile Include="Noughts_and_Crosses.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player_Alphabeta.cpp" />

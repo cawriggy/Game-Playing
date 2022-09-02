@@ -22,7 +22,7 @@ int Player_Alphabeta_Mancala::ChooseAction(const GameClass& game)
 	int a = static_cast<int>(-1e9);
 	int b = static_cast<int>(1e9);
 
-	for (int action : game.AllActions)
+	for (int action : AllActions)
 	{
 		if (!game.IsValidAction(action)) { continue; }
 
@@ -116,7 +116,7 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 			return bestScore;
 		}
 
-		for (int action : game.AllActions)
+		for (int action : AllActions)
 		{
 			if (!game.IsValidAction(action)) { continue; }
 
@@ -174,7 +174,7 @@ int Player_Alphabeta_Mancala::MinmaxState(GameClass& game, int depth, int a, int
 		}
 
 
-		for (int action : game.AllActions)
+		for (int action : AllActions)
 		{
 			if (!game.IsValidAction(action)) { continue; }
 

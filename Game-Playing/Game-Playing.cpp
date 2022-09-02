@@ -29,6 +29,7 @@
 #include "Player_Human.h"
 
 
+
 Game::PlayState PlayAGame(auto& game, auto& p1, auto& p2)
 {
     //assert(&p1 != &p2); //the players may need to be distinct (to get the correct player number)
@@ -93,8 +94,12 @@ void maxTurnsInNGames(auto& game, auto& p1, auto& p2, int n, std::map<Game::Play
 
 
 
+int doMoveOrdering(); //from MoveOrdering.cpp
+
 int main()
 {
+
+    doMoveOrdering();
 
     ////play against alphabeta
     ////auto game = Game_Connect4_Bitboards();
@@ -122,44 +127,44 @@ int main()
 
 
 
-    //seed random with current time
-    srand((unsigned int)time(0));
+    ////seed random with current time
+    //srand((unsigned int)time(0));
 
 
-    auto game = Game_Mancala();
+    //auto game = Game_Mancala();
 
 
-    auto pRandom = Player_Random();
-    //int depth = 5;
+    //auto pRandom = Player_Random();
+    ////int depth = 5;
 
-    auto abManc1 = Player_Alphabeta_Mancala();
-    abManc1.SetDepthLimit(8);
+    //auto abManc1 = Player_Alphabeta_Mancala();
+    //abManc1.SetDepthLimit(8);
 
-    auto abManc2 = Player_Alphabeta_Mancala();
-    abManc2.SetDepthLimit(16);
+    //auto abManc2 = Player_Alphabeta_Mancala();
+    //abManc2.SetDepthLimit(16);
 
-    //PlayAGame(game, abManc1, abManc2);
-    //game.DisplayActionSequence();
+    ////PlayAGame(game, abManc1, abManc2);
+    ////game.DisplayActionSequence();
 
-    int n = 1000;
-    std::map<Game::PlayState, int> counts;
+    //int n = 1000;
+    //std::map<Game::PlayState, int> counts;
 
-    //time the process
-    typedef std::chrono::steady_clock Clock;
+    ////time the process
+    //typedef std::chrono::steady_clock Clock;
 
-    for (int i = 0; i < 5; i++)
-    {
-        auto last = Clock::now();
+    //for (int i = 0; i < 5; i++)
+    //{
+    //    auto last = Clock::now();
 
-        //play some games
-        counts.clear();
-        //PlayNGames(game, pRandom, abManc1, n, counts);
-        PlayNGames(game, pRandom, pRandom, n, counts);
+    //    //play some games
+    //    counts.clear();
+    //    //PlayNGames(game, pRandom, abManc1, n, counts);
+    //    PlayNGames(game, pRandom, pRandom, n, counts);
 
-        auto time = Clock::now();
-        auto diff = std::chrono::duration<double, std::milli >(time - last).count();
-        std::cout << diff << " ms\n";
-    }
+    //    auto time = Clock::now();
+    //    auto diff = std::chrono::duration<double, std::milli >(time - last).count();
+    //    std::cout << diff << " ms\n";
+    //}
 
 
     ////wait for keypress before closing (to keep release exe terminal open)

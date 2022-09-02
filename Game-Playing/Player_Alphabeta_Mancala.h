@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Game_Mancala.h"
+#include <array>
 
 class Player_Alphabeta_Mancala
 {
@@ -35,6 +36,9 @@ public:
     {
         return "Alphabeta for Mancala depth:" + std::to_string(GetDepthLimit()); 
     }
+
+    //std::array<int, 6> AllActions = { 5,4,3,2,1,0 };
+    std::array<int, 6> AllActions = { 0,1,2,3,4,5 };
 
 private:
     int depthLimit = 2;
