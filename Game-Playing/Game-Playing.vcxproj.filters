@@ -48,9 +48,6 @@
     <ClCompile Include="Game_Connect4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Game_Connect4_Bitboards.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Player_Human.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game_Connect4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Game_Connect4_Bitboards.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Player_Human.h">
