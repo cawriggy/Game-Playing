@@ -168,6 +168,7 @@
     </ClCompile>
     <ClCompile Include="TestMancala.cpp" />
     <ClCompile Include="TestConnect4.cpp" />
+    <ClCompile Include="Test_MCTS.cpp" />
     <ClCompile Include="Test_Players.cpp" />
     <ClCompile Include="TestNoughtsAndCrosses.cpp" />
     <ClCompile Include="UnitTestGamePlaying.cpp" />
