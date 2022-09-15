@@ -1,6 +1,3 @@
-#include "Player_Alphabeta_Mancala.h"
-#include "Game_Mancala.h"
-
 #include <random>
 #include <iostream>
 #include <string>
@@ -14,7 +11,6 @@
 #include <math.h>
 
 #include "Game.h"
-
 #include "Game_Mancala.h"
 #include "Player_Random.h"
 #include "Player_Alphabeta_Mancala.h"
@@ -43,15 +39,12 @@ struct option
 
     void shuffleUnchosen()
     {
-        if (IsFullyChosen()) { return; }
+        if (numChosen >= MoveOrder.size()) { return; }
 
         std::random_device rd;
         std::mt19937 g(rd());
 
         std::shuffle(MoveOrder.begin() + numChosen, MoveOrder.end(), g);
-
-        //std::copy(MoveOrder.begin(), MoveOrder.end(), std::ostream_iterator<int>(std::cout, " "));
-        //std::cout << "\n";
     }
 
 
@@ -63,23 +56,6 @@ struct option
         return copy;
     }
 
-
-    bool IsFullyChosen() const { return numChosen >= MoveOrder.size(); }
-
-    bool IsTerminal() const { return IsFullyChosen(); }
-
-    bool operator<(const option& other) const
-    {
-        if (numChosen < other.numChosen) { return true; }
-        for (unsigned i = 0; i < numChosen; i++)
-        {
-            if (MoveOrder[i] < other.MoveOrder[i])
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     std::vector<option> GetChildNodes()
     {
@@ -96,6 +72,28 @@ struct option
         }
         return nodes;
     }
+
+    void display() const
+    {
+        for (auto i : MoveOrder)
+        {
+            std::cout << i;
+        }
+    }
+
+
+    bool operator<(const option& other) const //for use in map
+    {
+        if (numChosen < other.numChosen) { return true; }
+        for (unsigned i = 0; i < numChosen; i++)
+        {
+            if (MoveOrder[i] < other.MoveOrder[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 
@@ -105,6 +103,7 @@ struct ucbt
     {
         double totalScore = 0;
         double numVisits = 0;
+    
         double value(double nTrials) const
         {
             return (totalScore / numVisits) + 0.7 * (sqrt(log(nTrials) / numVisits));
@@ -116,34 +115,31 @@ struct ucbt
     {
         std::cout << "n: " << totalFeedback;
         std::cout << ", selection: ";
-        for (auto i : op.MoveOrder)
-        {
-            std::cout << i;
-        }
+
+        op.display();
 
         if (data.contains(op))
         {
             auto& a = data[op];
-            std::cout << ", visits: " << a.numVisits << ", mean score: " << a.totalScore / a.numVisits << '\n';
+            std::cout << ", visits: " << a.numVisits << ", mean score: " << a.totalScore / a.numVisits << std::endl;
         }
     }
 
 
     option get(option root = option())
     {
-        auto op = root;//option();
+        auto op = root;
 
         while (data.contains(op))
         {
             double n = data[op].numVisits;
             auto children = op.GetChildNodes();
 
-            //return node with no children
+            //return a node with no children
             if (children.size() == 0)
             {
                 return op.completed();
             }
-
 
             //return an untried child
             for (const auto& child : children)
@@ -154,29 +150,13 @@ struct ucbt
                 }
             }
 
-            //select the best child
+            //select a child
             auto pr = std::max_element(children.begin(), children.end(), [this, n](const option& a, const option& b) {
                 return data[a].value(n) < data[b].value(n);
             });
             assert(pr != data.end());
             op = *pr;
-
-
-
-            //auto& best = children[0];
-            //double bestScore = data[best].value(n);
-
-            //for (const auto& child : children)
-            //{
-            //    auto v = data[child].value(n);
-            //    if (v > bestScore)
-            //    {
-            //        bestScore = v;
-            //        best = child;
-            //    }
-            //}
-            //op = best;
-
+            
         }
 
         return op.completed();
@@ -184,7 +164,6 @@ struct ucbt
     }
 
 
-    //update scores for visited nodes and add upto 1 new node
     void feedback(option op, double value, double weight = 1)
     {
         totalFeedback += weight;
@@ -192,17 +171,8 @@ struct ucbt
         for (unsigned i = 0; i <= op.numChosen; i++)
         {
             copy.numChosen = i;
-            if (data.contains(copy))
-            {
-                data[copy].totalScore += value;
-                data[copy].numVisits += weight;
-            }
-            else
-            {
-                data[copy].totalScore += value;
-                data[copy].numVisits += weight;
-                //break;//add at most one new node per feedback call
-            }
+            data[copy].totalScore += value;
+            data[copy].numVisits += weight;
         }
 
     }
@@ -218,11 +188,11 @@ private:
 int doMoveOrdering()
 {
     //
-    // identify a good static move ordering for for alphabeta mancala
+    // identify a good static move ordering for alphabeta mancala
     //
 
 
-    // score a move rdering by how long it takes to play against a random player
+    // score a move ordering by how long it takes to play against a random player
     auto score = [](option moveOrder) 
     {
         //start time
@@ -233,7 +203,7 @@ int doMoveOrdering()
         auto game = Game_Mancala();
         auto pRandom = Player_Random();
         auto abManc1 = Player_Alphabeta_Mancala();
-        abManc1.SetDepthLimit(8);
+        abManc1.SetDepthLimit(5);
         abManc1.AllActions = moveOrder.MoveOrder;
         PlayAGame(game, pRandom, abManc1);
 
@@ -244,14 +214,32 @@ int doMoveOrdering()
     };
 
 
-    auto sampler = ucbt();
+    int num = 3000;
 
-    for (int i = 0; i < 500; i++)
+    for (int i = 0; i < 1; i++)
     {
-        auto op = sampler.get();
-        auto v = score(op);
-        sampler.feedback(op, v);
-        sampler.display(op);
+
+        //start time
+        typedef std::chrono::steady_clock Clock;
+        auto last = Clock::now();
+
+
+        auto sampler = ucbt();
+
+        for (int i = 0; i < num; i++)
+        {
+            auto op = sampler.get();
+            auto v = score(op) + score(op) + score(op) + score(op) + score(op);
+            v /= 2.5;
+            sampler.feedback(op, v);
+            sampler.display(op);
+        }
+
+
+        //stop time
+        auto time = Clock::now();
+        auto diff = std::chrono::duration<double, std::milli >(time - last).count();
+        std::cout << "time: " << diff << "\n";
     }
 
     return 0;
