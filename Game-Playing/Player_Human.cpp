@@ -1,6 +1,8 @@
 #include "Player_Human.h"
 #include <iostream>
-int AskForChoice(const std::vector<int>& options);
+#include <algorithm>
+
+int AskForChoice(std::vector<int> options);
 
 int Player_Human::ChooseAction(const Game& game)
 {
@@ -16,8 +18,10 @@ int Player_Human::ChooseAction(const Game& game)
 
 
 
-int AskForChoice(const std::vector<int>& options)
+int AskForChoice(std::vector<int> options)
 {
+	std::sort(options.begin(), options.end());
+
 	auto isAvailable = [options](int chosen) {return std::find(options.begin(), options.end(), chosen) != options.end(); };
 
 	std::string validInput;

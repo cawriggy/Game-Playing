@@ -40,7 +40,7 @@ public:
 	std::unique_ptr<Game> Clone() const { return std::make_unique<Game_Mancala>(*this); }
 	std::vector<int> GetStateVector() const;
 
-	const std::array<int, 6> AllActions = { 5,4,3,2,1,0 };
+	const std::array<int, 6> AllActions = { 0,1,2,3,4,5 };
 
 	// visualisation
 	void SetPerspective(int player) { persepective = player; }

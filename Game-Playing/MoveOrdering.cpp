@@ -184,14 +184,9 @@ private:
 
 
 
-
-int doMoveOrdering()
+//use monte carlo tree search to identify a good static move ordering for mancala
+void DoMoveOrdering()
 {
-    //
-    // identify a good static move ordering for alphabeta mancala
-    //
-
-
     // score a move ordering by how long it takes to play against a random player
     auto score = [](option moveOrder) 
     {
@@ -230,7 +225,7 @@ int doMoveOrdering()
         {
             auto op = sampler.get();
             auto v = score(op) + score(op) + score(op) + score(op) + score(op);
-            v /= 2.5;
+            v /= 5;
             sampler.feedback(op, v);
             sampler.display(op);
         }
@@ -241,8 +236,6 @@ int doMoveOrdering()
         auto diff = std::chrono::duration<double, std::milli >(time - last).count();
         std::cout << "time: " << diff << "\n";
     }
-
-    return 0;
 
 }
 
@@ -256,11 +249,6 @@ int doMoveOrdering()
 
 //int doMoveOrdering_allInOne()
 //{
-//
-//    //
-//    // try to identfy the best move to try first
-//    // could try montecarlo, could try minmax
-//    //
 //
 //
 //
