@@ -1,63 +1,45 @@
-# Game-Playing
-Exploring algorithms to play 2-player zero-sum games with the aim to create an AI player for a card game.
+# Creating opponents for 2-player zero-sum games
 
+- Noughts and Crosses
+- Connect 4
+- Mancala
 
-
-# Exploring game playing algorithms in Noughts and Crosses
-### Structure code to enable extensions to other two player games
-
-two player zero-sum games (i.e. one player wins and the other loses or the game is a draw)
-
-# Algorithms
+### 1. Techniques
+- Random actions
 - Minimax
-- Alpha-Beta pruning
-- random actions
+- Alpha-beta pruning
 
-minimax can play optimally if you can let it take the time to search to the end of the game
+Randomly selected actions are quick but often not effective. They can be useful for testing.
 
-alpha-beta pruning makes the same choices but is faster by skipping some irrelevant branches of the search tree
-(if you found a that you can force a draw you don't need to search to the end of a branch where the opponent has the option to make you lose)
+Minimax can play optimally according to some score function if you can let it take the time to search to the end of the game. More commonly the search depth is restricted.   https://en.wikipedia.org/wiki/Minimax
 
-random actions are quick but not effective
-
-
-
-# Minimax
-maximise the minimum score an opponent must allow you
-https://en.wikipedia.org/wiki/Minimax
-
-A terminal state is a win, loss, or draw. Greater scores are given to better outcomes (win early, lose late)
-Earlier states are scored by recursively scoring future states.
-  You take action to maximise your score;
-  your opponent takes actions to minimise it.
-
-Considering every future state can take too long.
-It can be faster to perform a depth limited search
-(e.g. looking upto 3 moves ahead instead of to the end of the game)
-Once the depth limit has been reached, the game states are scored approximately.
-One way to do this is to take random moves until a terminal state is reached and use the score of that state. (Random moves can be chosen quickly and only one path to the end of the game is considered instead of many)
-
-Minimax assumes both players optimally minimise and maximise the score
-if an opponent can force a loss in 10 turns and losing in 10 turns has the same score as losing in 1 turn then minimax can make seemingly terrible choices (at least from the perspective of a non-optimal player)
-It may be preferable to favour losing in 10 turns over losing in 1 turn. This can be done by reducing the value of future states so that future losses are less negative and future wins are less positive.
-
-if an opponent has multiple ways of forcing the minimum score than a minmax player will pick an arbitrary action rather than try to reduce the number of optimal options for the opponent.
-This is because assumes that the opponent can only execute a perfect minmax strategy. If this is not the case (e.g. when playing against a person) then a minmax player can make seemingingly terrible choices even when it is allowed to search the entire game tree.
-if the opponent can limit the minmax score regardless of the players action then a minmax player will make no attempt to make it difficult to do so.
-if the opponent might not follow a perfect minmax strategy then a minmax player will effectively give up too soon.
-
-The minmax player assumes that the opponent plays perferctly.
-If you can force a draw then a minmax opponent will make no attempt to win. It will take arbitrary moves that, while not allowing you to win, will not try to make it difficult for you to draw.
-
-If an optimal player could force a win then minmax will not resist.
-
-# Alpha-beta pruning
-Makes minimax faster without changing the result
+Alpha-beta pruning can be used to skip some irrelevant branches of the search tree when calculating the minimax value. e.g. if you found that you can force a draw you don't need to search to the end of a branch where the opponent has the option to make you lose.
 https://en.wikipedia.org/wiki/Alpha-beta_pruning
+https://www.chessprogramming.org/Alpha-Beta
 
-skip branches that cannot affect the result
-(when the current branch is too good for your opponent to allow or too bad for you to choose, i.e. either player prefer another option they already saw)
-alpha is the minimum score you are willing to accept
-beta is the maximum score your opponent is willing to accept
-alpha and beta are updated as more preferable options are found so a player will not accept anything worse than their current best option
+### 2. Scoring
+For Noughts and Crosses and Connect 4, a score function was used to evaluate the terminal state. If the depth limit was reached the state was scored as a draw. (Random playouts were not found to be effective for these games.)
 
+The score for Mancala was evaluated at any state using the number of stones in the mancalas. Long term bounds on the score function were used to achieve earlier cutoffs with Alpha-beta pruning. Eg don't search a branch where there are only 9 stones remaining but 10 are needed to beat the best alternative. 
+A heuristic score evaluated nearer the end of the game is a more accurate reflection of the final outcome. So deeper searches tend to give better play and play was better towards the end of the game.
+
+It is important to ensure the score function aligns with the intended selections. eg it may be preferable to favour losing in 10 turns over losing in 1 turn because the opponent may be sub optimal and make a mistake. If the score function only considers wins/losses/draws, a Minimax player has no reason to avoid terrible moves if its opponent can already force a  win. Even if the win is many moves in the future. For this reason a deeper searching Minimax player can actually play worse. This was seen in a Noughts and Crosses scenario when it didn't bother blocking either of 2 winning options for the opponent.
+
+### 3. Move ordering
+The speed of Alpha-beta pruning is improved if good options are searched earlier since this allows more cutoffs (by raising the minimum score sooner).
+For example in this implementation, reversing the move ordering for Mancala reduced the time taken by 80%. (The time to play 100 games of random player vs alphabeta_mancala depth 8 decreased from 3s to 0.6s) 
+A Monte Carlo tree search was then implemented to identify a good order of moves to search.
+
+### 4. Performance
+To search deeper you need to evaluate states faster or evaluate less states. To evaluate fewer states, caching was used with Minimax to reuse previous results and better move ordering was used for alphabeta. To traverse game states faster the games were optimised eg by using bitwise computation for Connect 4, and avoiding allocating vectors where possible for Mancala.
+
+### 5. Important considerations for creating AI opponents
+Any states that are given the same value will be chosen between arbitrarily. If the score function is not chosen wisely and a perfect opponent could force a win then a Minimax player won't make it difficult for a weak opponent to win. More generally it will not try to make it difficult for a weak player to do as well as a strong player. This is likely to be undesirable in an AI player. To avoid this a more fine grained score function is needed - eg for Connect 4 this was addressed by making winning early and losing later better. For Mancala the margin of the win was used. 
+
+
+
+## How to run 
+- Open the solution file in Visual Studio 2022.
+- Hit F5 
+
+You can change the search depth or play interactively by editing Game-Playing.cpp
